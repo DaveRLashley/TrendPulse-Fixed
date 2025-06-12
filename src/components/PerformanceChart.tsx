@@ -5,11 +5,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 interface PerformanceChartProps {
   title: string;
   data?: number[];
-  labels?: string[];
   type?: 'line' | 'bar' | 'doughnut';
 }
 
-export function PerformanceChart({ title, data = [], labels = [], type = 'line' }: PerformanceChartProps) {
+export function PerformanceChart({ title, data = [], type = 'line' }: PerformanceChartProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {

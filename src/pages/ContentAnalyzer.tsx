@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Search, Zap, Hash, Target, Clock, TrendingUp, Copy } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,7 +28,7 @@ export default function ContentAnalyzer() {
   const [content, setContent] = useState("");
   const [platform, setPlatform] = useState("youtube");
   const [analysis, setAnalysis] = useState<ContentAnalysis | null>(null);
-  
+
   const { toast } = useToast();
 
   const analyzeMutation = useMutation({

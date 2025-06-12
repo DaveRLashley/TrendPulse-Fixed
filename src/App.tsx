@@ -6,7 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { useLocation } from "wouter";
-import { useEffect } from "react";
 
 // Pages
 import Dashboard from "@/pages/Dashboard";
@@ -34,11 +33,6 @@ const getPageTitle = (location: string) => {
     default:
       return "Dashboard";
   }
-};
-
-const getFullPageTitle = (location: string) => {
-  const pageTitle = getPageTitle(location);
-  return `${pageTitle} | TrendPulse`;
 };
 
 function Router() {
