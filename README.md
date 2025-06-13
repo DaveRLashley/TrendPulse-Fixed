@@ -33,6 +33,7 @@ TrendPulse is a rapidly developed MVP, built in just a few hours originally usin
 The project highlights fast prototyping using AI tools and showcases how effective a solo developer can be with a focused goal and the right technology.
 
 Planned improvements include:
+- Instagram integration
 - Saving user sessions
 - Multi-platform analytics
 - UI refinements and deeper content analysis
