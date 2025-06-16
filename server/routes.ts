@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage.js";
-import { insertContentSuggestionSchema, insertProjectSchema } from "@shared/schema";
+import { insertContentSuggestionSchema, insertProjectSchema } from "@shared/schema.js"; // <-- Fixed
 import { z } from "zod";
 import OpenAI from "openai";
 

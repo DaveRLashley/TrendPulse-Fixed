@@ -7,8 +7,9 @@
     "noEmit": false,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@shared/*": ["./shared/*"]
     }
   },
-  "include": ["server"]
+  "include": ["server", "shared"]
 }
