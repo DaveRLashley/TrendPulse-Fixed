@@ -3,7 +3,10 @@ import fs from "fs";
 import path from "path";
 import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
+import viteConfig from "../vite.config.js"; // <--- THIS IS THE FIX
 import { nanoid } from "nanoid";
+
+// ... (The rest of your vite.ts code remains exactly the same as before)
 
 const viteLogger = createLogger();
 
@@ -14,7 +17,8 @@ export function log(message: string, source = "express") {
     second: "2-digit",
     hour12: true,
   });
-  console.log(`${formattedTime} [${source}] ${message}`);
+
+  console.log(`<span class="math-inline">\{formattedTime\} \[</span>{source}] ${message}`);
 }
 
 export async function setupVite(app: Express, server: Server) {
@@ -26,13 +30,13 @@ export async function setupVite(app: Express, server: Server) {
   app.use(vite.middlewares);
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
+
     try {
       const clientTemplate = path.resolve(process.cwd(), "index.html");
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
       template = await vite.transformIndexHtml(url, template);
-      const { render } = await vite.ssrLoadModule("/src/entry-server.tsx");
-      const appHtml = await render(url);
-      const page = template.replace(`<!--ssr-outlet-->`, appHtml);
+      const { render } = await vite.ssrLoadModule("/src/main.tsx"); // Correct path to frontend entry
+      const page = template.replace(`<!--ssr-outlet-->`, render);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
@@ -42,10 +46,13 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(process.cwd(), "dist/client");
+  const distPath = path.resolve(process.cwd(), "dist"); // Correct path to frontend build output
   if (!fs.existsSync(distPath)) {
-    throw new Error(`Could not find client build directory: ${distPath}`);
+    throw new Error(
+      `Could not find the build directory: ${distPath}, make sure to build the client first`
+    );
   }
+
   app.use(express.static(distPath));
   app.use("*", (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));

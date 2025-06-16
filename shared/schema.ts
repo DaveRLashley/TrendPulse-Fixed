@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, real, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, real, jsonb, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -11,7 +11,7 @@ export const users = pgTable("users", {
 export const trendingVideos = pgTable("trending_videos", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
-  platform: text("platform").notNull(), // 'youtube' | 'tiktok'
+  platform: text("platform").notNull(),
   views: integer("views").notNull(),
   viralScore: real("viral_score").notNull(),
   creator: text("creator").notNull(),
@@ -25,9 +25,9 @@ export const contentSuggestions = pgTable("content_suggestions", {
   topic: text("topic").notNull(),
   platform: text("platform").notNull(),
   style: text("style").notNull(),
-  titles: jsonb("titles").notNull(),
-  tags: jsonb("tags").notNull(),
-  contentIdeas: jsonb("content_ideas").notNull(),
+  titles: jsonb("titles").$type<string[]>().notNull(),
+  tags: jsonb("tags").$type<string[]>().notNull(),
+  contentIdeas: jsonb("content_ideas").$type<Array<{ title: string; description: string; engagement: string }>>().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -35,7 +35,7 @@ export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description"),
-  status: text("status").notNull(), // 'planning' | 'in-progress' | 'completed'
+  status: text("status").notNull(),
   progress: integer("progress").default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -54,39 +54,21 @@ export const analytics = pgTable("analytics", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
+// Zod schemas for validation
+export const insertUserSchema = createInsertSchema(users);
+export const insertTrendingVideoSchema = createInsertSchema(trendingVideos);
+export const insertContentSuggestionSchema = createInsertSchema(contentSuggestions);
+export const insertProjectSchema = createInsertSchema(projects);
+export const insertAnalyticsSchema = createInsertSchema(analytics);
 
-export const insertTrendingVideoSchema = createInsertSchema(trendingVideos).omit({
-  id: true,
-  createdAt: true,
-});
-
-export const insertContentSuggestionSchema = createInsertSchema(contentSuggestions).omit({
-  id: true,
-  createdAt: true,
-});
-
-export const insertProjectSchema = createInsertSchema(projects).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export const insertAnalyticsSchema = createInsertSchema(analytics).omit({
-  id: true,
-  createdAt: true,
-});
-
+// TypeScript types inferred from the database schemas
 export type User = typeof users.$inferSelect;
-export type InsertUser = z.infer<typeof insertUserSchema>;
+export type InsertUser = typeof users.$inferInsert;
 export type TrendingVideo = typeof trendingVideos.$inferSelect;
-export type InsertTrendingVideo = z.infer<typeof insertTrendingVideoSchema>;
+export type InsertTrendingVideo = typeof trendingVideos.$inferInsert;
 export type ContentSuggestion = typeof contentSuggestions.$inferSelect;
-export type InsertContentSuggestion = z.infer<typeof insertContentSuggestionSchema>;
+export type InsertContentSuggestion = typeof contentSuggestions.$inferInsert;
 export type Project = typeof projects.$inferSelect;
-export type InsertProject = z.infer<typeof insertProjectSchema>;
+export type InsertProject = typeof projects.$inferInsert;
 export type Analytics = typeof analytics.$inferSelect;
-export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
+export type InsertAnalytics = typeof analytics.$inferInsert;

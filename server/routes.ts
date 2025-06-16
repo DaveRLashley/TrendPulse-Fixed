@@ -1,9 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage.js";
-import { insertContentSuggestionSchema, insertProjectSchema } from "@shared/schema.js";
+import { insertContentSuggestionSchema, insertProjectSchema } from "../shared/schema.js";
 import { z } from "zod";
 import OpenAI from "openai";
+
+// ... (The rest of your routes.ts code remains exactly the same as before)
+// [I've omitted the rest of the file for brevity, just make sure this import section at the top is correct]
 
 const openai = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY || ""
