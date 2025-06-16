@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage.js";
-import { insertContentSuggestionSchema, insertProjectSchema } from "@shared/schema.js"; // <-- Fixed
+import { insertContentSuggestionSchema, insertProjectSchema } from "@shared/schema.js";
 import { z } from "zod";
 import OpenAI from "openai";
 
@@ -34,7 +34,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }).parse(req.body);
 
       try {
-        // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         const response = await openai.chat.completions.create({
           model: "gpt-4o",
           messages: [
@@ -57,7 +56,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         const aiSuggestions = JSON.parse(response.choices[0].message.content || "{}");
 
-        // Save the suggestions to storage
         const suggestion = await storage.createContentSuggestion({
           topic,
           platform,
@@ -71,7 +69,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (openaiError) {
         console.error("OpenAI API error:", openaiError);
         
-        // Provide fallback suggestions when AI service is unavailable
         const fallbackSuggestion = await storage.createContentSuggestion({
           topic,
           platform,
@@ -83,40 +80,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
             `${topic} Secrets Revealed`,
             `${topic} - Beginner to Pro in Minutes`
           ],
-          tags: [
-            "viral",
-            "trending",
-            platform === "youtube" ? "shorts" : "fyp",
-            "tips",
-            "howto",
-            "tutorial",
-            "2024",
-            "mustwatch"
-          ],
+          tags: ["viral", "trending", platform === "youtube" ? "shorts" : "fyp", "tips", "howto", "tutorial", "2024", "mustwatch"],
           contentIdeas: [
-            {
-              title: "Hook with a Question",
-              description: `"Did you know..." about ${topic}`,
-              engagement: "High"
-            },
-            {
-              title: "Before/After Format",
-              description: `Show transformation related to ${topic}`,
-              engagement: "Very High"
-            },
-            {
-              title: "Common Mistakes",
-              description: `"3 mistakes everyone makes with ${topic}"`,
-              engagement: "High"
-            },
-            {
-              title: "Quick Tips",
-              description: `Rapid-fire tips about ${topic}`,
-              engagement: "Medium"
-            }
+            { title: "Hook with a Question", description: `"Did you know..." about ${topic}`, engagement: "High" },
+            { title: "Before/After Format", description: `Show transformation related to ${topic}`, engagement: "Very High" },
+            { title: "Common Mistakes", description: `"3 mistakes everyone makes with ${topic}"`, engagement: "High" },
+            { title: "Quick Tips", description: `Rapid-fire tips about ${topic}`, engagement: "Medium" }
           ]
         });
-
         res.json(fallbackSuggestion);
       }
     } catch (error) {
@@ -165,12 +136,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const updates = req.body;
       const project = await storage.updateProject(id, updates);
-      
       if (!project) {
-        res.status(404).json({ message: "Project not found" });
-        return;
+        return res.status(404).json({ message: "Project not found" });
       }
-      
       res.json(project);
     } catch (error) {
       res.status(500).json({ message: "Failed to update project" });
@@ -186,7 +154,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }).parse(req.body);
 
       try {
-        // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         const response = await openai.chat.completions.create({
           model: "gpt-4o",
           messages: [
@@ -208,13 +175,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ],
           response_format: { type: "json_object" }
         });
-
         const analysis = JSON.parse(response.choices[0].message.content || "{}");
         res.json(analysis);
       } catch (openaiError) {
         console.error("OpenAI API error:", openaiError);
-        
-        // Provide intelligent fallback analysis
         const fallbackAnalysis = {
           optimizedTitles: [
             `${content.slice(0, 30)}... (You Won't Believe What Happens!)`,
@@ -223,55 +187,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
             `Watch This Before You ${content.slice(0, 20)}...`,
             `${content.slice(0, 25)}... (VIRAL METHOD)`
           ],
-          viralTags: [
-            "viral",
-            "trending",
-            platform === "youtube" ? "shorts" : "fyp",
-            "mustsee",
-            "amazing",
-            "shocking",
-            "tips",
-            "hacks",
-            "2024",
-            "popular",
-            "explore",
-            "foryou"
-          ],
+          viralTags: ["viral", "trending", platform === "youtube" ? "shorts" : "fyp", "mustsee", "amazing", "shocking", "tips", "hacks", "2024", "popular", "explore", "foryou"],
           hookIdeas: [
-            {
-              hook: "Start with a shocking statistic or fact",
-              description: `"Did you know that 90% of people don't know about ${content.slice(0, 20)}..."`,
-              engagement: "Very High"
-            },
-            {
-              hook: "Use the 'Before vs After' format",
-              description: `Show dramatic transformation related to: ${content.slice(0, 30)}`,
-              engagement: "High"
-            },
-            {
-              hook: "Ask a provocative question",
-              description: `"What if I told you ${content.slice(0, 25)} could change your life?"`,
-              engagement: "High"
-            },
-            {
-              hook: "Create urgency or FOMO",
-              description: `"This ${content.slice(0, 20)} trick won't work much longer..."`,
-              engagement: "Medium"
-            },
-            {
-              hook: "Use controversy or debate",
-              description: `"Everyone is wrong about ${content.slice(0, 20)}..."`,
-              engagement: "High"
-            }
+            { hook: "Start with a shocking statistic or fact", description: `"Did you know that 90% of people don't know about ${content.slice(0, 20)}..."`, engagement: "Very High" },
+            { hook: "Use the 'Before vs After' format", description: `Show dramatic transformation related to: ${content.slice(0, 30)}`, engagement: "High" },
+            { hook: "Ask a provocative question", description: `"What if I told you ${content.slice(0, 25)} could change your life?"`, engagement: "High" },
+            { hook: "Create urgency or FOMO", description: `"This ${content.slice(0, 20)} trick won't work much longer..."`, engagement: "Medium" },
+            { hook: "Use controversy or debate", description: `"Everyone is wrong about ${content.slice(0, 20)}..."`, engagement: "High" }
           ],
           contentStrategy: {
             bestTiming: platform === "youtube" ? "Peak hours: 6-9 PM" : "Peak hours: 6-10 AM, 7-9 PM",
             format: platform === "youtube" ? "Vertical video, captions, strong thumbnail" : "Trending audio, quick cuts, text overlay",
             approach: "Hook within first 3 seconds, maintain high energy, clear call-to-action"
           },
-          viralScore: Math.floor(Math.random() * 3) + 7 // Random score between 7-9
+          viralScore: Math.floor(Math.random() * 3) + 7
         };
-
         res.json(fallbackAnalysis);
       }
     } catch (error) {

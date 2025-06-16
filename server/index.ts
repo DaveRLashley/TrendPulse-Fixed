@@ -1,7 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes.js";
 import { setupVite, serveStatic, log } from "./vite.js";
-import http from 'http'; // Import the http module
+import http from 'http';
 
 const app = express();
 app.use(express.json());
@@ -45,22 +45,18 @@ app.use((req, res, next) => {
     const message = err.message || "Internal Server Error";
 
     res.status(status).json({ message });
-    // It's often better not to re-throw the error in production
-    // as it can crash the server. Let the error handler manage it.
-    console.error(err); 
+    console.error(err);
   });
 
-  // Render sets the NODE_ENV to 'production' automatically.
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
 
-  // Render provides the port via an environment variable.
   const port = process.env.PORT || 5000;
   server.listen({
-    port: Number(port), // Ensure port is a number
+    port: Number(port),
     host: "0.0.0.0",
   }, () => {
     log(`serving on port ${port}`);

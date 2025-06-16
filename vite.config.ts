@@ -7,7 +7,6 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      // This is the correct way to resolve the path from the project root
       '@': path.resolve(process.cwd(), 'src'),
     },
   },
