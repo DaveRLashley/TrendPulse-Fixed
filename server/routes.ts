@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { storage } from "./storage.js";
 import { insertContentSuggestionSchema, insertProjectSchema } from "../shared/schema.js";
 import { z } from "zod";
-import OpenAI from "openai";
+import type OpenAI from "openai";
 
 export function registerRoutes(app: Express, openai: OpenAI) {
   app.get("/api/trending", async (req, res) => {

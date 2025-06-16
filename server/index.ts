@@ -9,9 +9,12 @@ dotenv.config();
 
 const app = express();
 
-// Allow requests from your Netlify frontend
+// Allow requests from your Netlify frontend and local development
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || "https://trendpulse-fixed.netlify.app",
+  origin: [
+    process.env.CORS_ORIGIN || "[https://trendpulse-fixed.netlify.app](https://trendpulse-fixed.netlify.app)",
+    "http://localhost:5173"
+  ],
   credentials: true
 }));
 
