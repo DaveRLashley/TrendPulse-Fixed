@@ -1,12 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./storage.js";
 import { insertContentSuggestionSchema, insertProjectSchema } from "@shared/schema";
 import { z } from "zod";
 import OpenAI from "openai";
 
 const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || ""
+  apiKey: process.env.OPENAI_API_KEY || ""
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -41,11 +41,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             {
               role: "system",
               content: `You are an expert social media content strategist. Generate engaging content suggestions for ${platform} based on the topic and style provided. Respond with a JSON object containing:
-              - titles: array of 5 catchy video titles
-              - tags: array of 8-10 relevant trending hashtags
-              - contentIdeas: array of 4 content hook ideas with title, description, and engagement level
+               - titles: array of 5 catchy video titles
+               - tags: array of 8-10 relevant trending hashtags
+               - contentIdeas: array of 4 content hook ideas with title, description, and engagement level
               
-              Make the content ${style} in style and optimized for ${platform} algorithm.`
+               Make the content ${style} in style and optimized for ${platform} algorithm.`
             },
             {
               role: "user",
@@ -96,7 +96,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           contentIdeas: [
             {
               title: "Hook with a Question",
-              description: `Start with "Did you know..." about ${topic}`,
+              description: `"Did you know..." about ${topic}`,
               engagement: "High"
             },
             {
@@ -193,13 +193,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             {
               role: "system",
               content: `You are an expert viral content optimizer for ${platform} Shorts. Analyze the provided content and generate optimization suggestions. Respond with a JSON object containing:
-              - optimizedTitles: array of 5 viral-optimized title variations
-              - viralTags: array of 10-12 trending hashtags optimized for ${platform}
-              - hookIdeas: array of 5 attention-grabbing hooks with engagement potential
-              - contentStrategy: object with recommendations for timing, format, and approach
-              - viralScore: predicted viral potential score (1-10)
+               - optimizedTitles: array of 5 viral-optimized title variations
+               - viralTags: array of 10-12 trending hashtags optimized for ${platform}
+               - hookIdeas: array of 5 attention-grabbing hooks with engagement potential
+               - contentStrategy: object with recommendations for timing, format, and approach
+               - viralScore: predicted viral potential score (1-10)
               
-              Focus on ${platform === 'youtube' ? 'YouTube Shorts algorithm preferences like retention, CTR, and engagement' : 'TikTok FYP optimization with trending sounds and challenges'}.`
+               Focus on ${platform === 'youtube' ? 'YouTube Shorts algorithm preferences like retention, CTR, and engagement' : 'TikTok FYP optimization with trending sounds and challenges'}.`
             },
             {
               role: "user",
