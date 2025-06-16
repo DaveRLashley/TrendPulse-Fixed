@@ -57,7 +57,8 @@ export class MemStorage implements IStorage {
     return [...this.users.values()].find(u => u.username === username);
   }
   async createUser(user: InsertUser): Promise<User> {
-    const newUser: User = { ...user, id: this.currentUserId++ };
+    // Assuming password is required on insert
+    const newUser: User = { ...user, id: this.currentUserId++, password: user.password! };
     this.users.set(newUser.id, newUser);
     return newUser;
   }
@@ -68,7 +69,12 @@ export class MemStorage implements IStorage {
     return videos;
   }
   async createTrendingVideo(video: InsertTrendingVideo): Promise<TrendingVideo> {
-    const newVideo: TrendingVideo = { ...video, id: this.currentVideoId++, createdAt: new Date(), thumbnailUrl: video.thumbnailUrl || null };
+    const newVideo: TrendingVideo = {
+      ...video,
+      id: this.currentVideoId++,
+      createdAt: new Date(),
+      thumbnailUrl: video.thumbnailUrl || null,
+    };
     this.trendingVideos.set(newVideo.id, newVideo);
     return newVideo;
   }
@@ -76,7 +82,11 @@ export class MemStorage implements IStorage {
     return [...this.contentSuggestions.values()];
   }
   async createContentSuggestion(suggestion: InsertContentSuggestion): Promise<ContentSuggestion> {
-    const newSuggestion: ContentSuggestion = { ...suggestion, id: this.currentSuggestionId++, createdAt: new Date() };
+    const newSuggestion: ContentSuggestion = {
+      ...suggestion,
+      id: this.currentSuggestionId++,
+      createdAt: new Date(),
+    };
     this.contentSuggestions.set(newSuggestion.id, newSuggestion);
     return newSuggestion;
   }
@@ -84,7 +94,17 @@ export class MemStorage implements IStorage {
     return [...this.projects.values()];
   }
   async createProject(project: InsertProject): Promise<Project> {
-    const newProject: Project = { ...project, id: this.currentProjectId++, createdAt: new Date(), updatedAt: new Date(), description: project.description || null, progress: project.progress || 0 };
+    const newProject: Project = {
+      // Establish all defaults first
+      description: null,
+      progress: 0,
+      // Spread incoming data
+      ...project,
+      // Enforce non-nullable fields and add generated values
+      id: this.currentProjectId++,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
     this.projects.set(newProject.id, newProject);
     return newProject;
   }
@@ -100,7 +120,22 @@ export class MemStorage implements IStorage {
     return allAnalytics.length > 0 ? allAnalytics[allAnalytics.length - 1] : undefined;
   }
   async createAnalytics(analyticsData: InsertAnalytics): Promise<Analytics> {
-    const newAnalytics: Analytics = { ...analyticsData, id: this.currentAnalyticsId++, createdAt: new Date() };
+    const newAnalytics: Analytics = {
+      // Establish all defaults first
+      totalViews: 0,
+      viralScore: 0,
+      engagementRate: 0,
+      growthRate: 0,
+      videosPublished: 0,
+      newFollowers: 0,
+      platformDistribution: null,
+      performanceData: null,
+      // Spread incoming data
+      ...analyticsData,
+      // Enforce non-nullable fields and add generated values
+      id: this.currentAnalyticsId++,
+      createdAt: new Date(),
+    };
     this.analytics.set(newAnalytics.id, newAnalytics);
     return newAnalytics;
   }
