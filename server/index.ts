@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import { createServer } from "http";
 import OpenAI from "openai";
-import { registerRoutes } from "./routes.js";
+import { registerRoutes } from "./routes";
 import cors from 'cors';
 
 dotenv.config();

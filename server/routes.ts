@@ -1,5 +1,5 @@
 import type { Express } from "express";
-import { storage } from "./storage.js";
+import { storage } from "./storage";
 import { z } from "zod";
 import type OpenAI from "openai";
 

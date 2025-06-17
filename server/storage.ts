@@ -14,7 +14,7 @@ import {
   type InsertProject,
   type Analytics,
   type InsertAnalytics
-} from "../shared/schema.js";
+} from "../shared/schema";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
