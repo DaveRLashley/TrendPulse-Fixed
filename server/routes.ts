@@ -39,7 +39,6 @@ export function registerRoutes(app: Express, openai: OpenAI) {
     res.json(analytics);
   });
 
-  // --- START: NEWLY ADDED ROUTE ---
   app.post("/api/ai-suggestions", async (req, res) => {
     try {
       const { topic, platform, style } = req.body;
@@ -51,13 +50,13 @@ export function registerRoutes(app: Express, openai: OpenAI) {
 
       const completion = await openai.chat.completions.create({
         messages: [{ role: "user", content: prompt }],
-        model: "gpt-4-turbo",
+        // --- THIS LINE IS THE ONLY CHANGE ---
+        model: "gpt-3.5-turbo",
         response_format: { type: "json_object" },
       });
 
       const result = completion.choices[0].message.content;
       if (result) {
-        // Here we also save the suggestion to our mock database
         const suggestionData = JSON.parse(result);
         await storage.createContentSuggestion({
             topic,
@@ -74,5 +73,4 @@ export function registerRoutes(app: Express, openai: OpenAI) {
       res.status(500).json({ error: "Failed to generate content" });
     }
   });
-  // --- END: NEWLY ADDED ROUTE ---
 }
