@@ -16,7 +16,7 @@ export const trendingVideos = pgTable("trending_videos", {
   viralScore: real("viral_score").notNull(),
   creator: text("creator").notNull(),
   category: text("category").notNull(),
-  thumbnailUrl: text("thumbnail_url"),
+  thumbnailUrl: text("thumbnail_url"), // <-- THIS LINE IS CRITICAL
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

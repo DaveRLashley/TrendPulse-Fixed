@@ -1,8 +1,31 @@
 import type { Express } from "express";
 import { storage } from "./storage.js";
-import { insertContentSuggestionSchema, insertProjectSchema } from "../shared/schema.js";
 import { z } from "zod";
 import type OpenAI from "openai";
+
+// Explicit Zod schema for creating a suggestion
+const createSuggestionSchema = z.object({
+  topic: z.string(),
+  platform: z.string(),
+  style: z.string(),
+  titles: z.array(z.string()),
+  tags: z.array(z.string()),
+  contentIdeas: z.array(
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      engagement: z.string(),
+    })
+  ),
+});
+
+// Explicit Zod schema for creating a project
+const createProjectSchema = z.object({
+  title: z.string(),
+  status: z.string(),
+  description: z.string().nullish(),
+  progress: z.number().optional(),
+});
 
 export function registerRoutes(app: Express, openai: OpenAI) {
   app.get("/api/trending", async (req, res) => {
@@ -15,12 +38,11 @@ export function registerRoutes(app: Express, openai: OpenAI) {
   });
 
   app.post("/api/suggestions", async (req, res) => {
-    const result = insertContentSuggestionSchema.safeParse(req.body);
+    const result = createSuggestionSchema.safeParse(req.body);
     if (!result.success) {
       return res.status(400).json({ error: result.error.format() });
     }
-    const suggestionData = result.data;
-    const suggestion = await storage.createContentSuggestion(suggestionData);
+    const suggestion = await storage.createContentSuggestion(result.data);
     res.status(201).json(suggestion);
   });
 
@@ -35,12 +57,11 @@ export function registerRoutes(app: Express, openai: OpenAI) {
   });
 
   app.post("/api/projects", async (req, res) => {
-    const result = insertProjectSchema.safeParse(req.body);
+    const result = createProjectSchema.safeParse(req.body);
     if (!result.success) {
       return res.status(400).json({ error: result.error.format() });
     }
-    const projectData = result.data;
-    const project = await storage.createProject(projectData);
+    const project = await storage.createProject(result.data);
     res.status(201).json(project);
   });
 
