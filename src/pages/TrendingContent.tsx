@@ -4,19 +4,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { VideoCard } from "@/components/VideoCard";
 import type { TrendingVideo } from "@/types";
+import API_BASE_URL from '@/lib/api'; // Or the correct relative path
 
 export default function TrendingContent() {
   const [platform, setPlatform] = useState("all");
   const [category, setCategory] = useState("all");
 
   const { data: videos, isLoading } = useQuery<TrendingVideo[]>({
-    queryKey: ['/api/trending-videos', { platform, category }],
+    // UPDATED queryKey to include the full base URL
+    queryKey: [`${API_BASE_URL}/api/trending-videos`, { platform, category }],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (platform !== 'all') params.append('platform', platform);
       if (category !== 'all') params.append('category', category);
       
-      const response = await fetch(`/api/trending-videos?${params}`, {
+      // UPDATED fetch call to use the full URL
+      const response = await fetch(`${API_BASE_URL}/api/trending-videos?${params.toString()}`, {
         credentials: 'include'
       });
       

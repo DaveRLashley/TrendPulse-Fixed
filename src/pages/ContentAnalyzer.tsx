@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import API_BASE_URL from '@/lib/api'; // Or the correct relative path
 
 interface ContentAnalysis {
   optimizedTitles: string[];
@@ -33,7 +34,8 @@ export default function ContentAnalyzer() {
 
   const analyzeMutation = useMutation({
     mutationFn: async ({ content, platform }: { content: string; platform: string }) => {
-      const response = await fetch('/api/analyze-content', {
+      // UPDATED LINE
+      const response = await fetch(`${API_BASE_URL}/api/analyze-content`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
