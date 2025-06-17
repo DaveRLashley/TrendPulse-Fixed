@@ -1,4 +1,5 @@
-import API_BASE_URL from '@/lib/api'; // Or the correct relative path
+// src/lib/openai.ts
+import API_BASE_URL from '@/lib/api';
 
 // Client-side utilities for working with AI suggestions
 // Note: Actual OpenAI calls are made server-side for security
@@ -22,7 +23,6 @@ export interface AIRequestParams {
 export const generateContentSuggestions = async (
   params: AIRequestParams
 ): Promise<AIContentSuggestion> => {
-  // UPDATED LINE
   const response = await fetch(`${API_BASE_URL}/api/ai-suggestions`, {
     method: 'POST',
     headers: {
@@ -41,7 +41,6 @@ export const generateContentSuggestions = async (
 };
 
 export const getContentSuggestionsHistory = async () => {
-  // UPDATED LINE
   const response = await fetch(`${API_BASE_URL}/api/content-suggestions`, {
     credentials: 'include',
   });
