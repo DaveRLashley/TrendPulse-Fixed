@@ -4,7 +4,7 @@ TrendPulse is an AI-powered app that analyzes viral YouTube and TikTok Shorts an
 
 ## 🚀 Live Demo
 
-**[Click here to try TrendPulse](https://trendpulse-fixed.netlify.app/)** *(You can update this link after the Netlify deployment is complete)*
+**[Click here to try TrendPulse](https://trendpulse-fixed.netlify.app/)**
 ![TrendPulse App Demo](./assets/demo.gif)
 
 ---
