@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Project } from "@/types";
+import API_BASE_URL from '@/lib/api';
 
 export default function CreatorWorkspace() {
   const [newProjectTitle, setNewProjectTitle] = useState("");
@@ -16,12 +17,14 @@ export default function CreatorWorkspace() {
   const queryClient = useQueryClient();
 
   const { data: projects, isLoading } = useQuery<Project[]>({
-    queryKey: ['/api/projects']
+    // UPDATED with full URL
+    queryKey: [`${API_BASE_URL}/api/projects`]
   });
 
   const createProjectMutation = useMutation({
     mutationFn: async (title: string) => {
-      const response = await apiRequest('POST', '/api/projects', {
+      // UPDATED with full URL
+      const response = await apiRequest('POST', `${API_BASE_URL}/api/projects`, {
         title,
         description: `New project: ${title}`,
         status: 'planning',
@@ -30,7 +33,8 @@ export default function CreatorWorkspace() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      // UPDATED to invalidate with full URL
+      queryClient.invalidateQueries({ queryKey: [`${API_BASE_URL}/api/projects`] });
       setNewProjectTitle("");
       toast({
         title: "Success!",
