@@ -16,6 +16,7 @@ import {
   type InsertAnalytics
 } from "../shared/schema";
 
+// (Interface is unchanged)
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -45,11 +46,51 @@ export class MemStorage implements IStorage {
   private currentAnalyticsId = 1;
 
   constructor() {
+    // Call the new method to populate data on startup
     this.initializeData();
   }
 
-  private initializeData() { /* Mock data can be added here if needed */ }
+  // NEW METHOD TO ADD MOCK DATA
+  private initializeData() {
+    // Create Mock Analytics Data
+    const mockAnalytics: Analytics = {
+      id: this.currentAnalyticsId++,
+      totalViews: 2400000,
+      viralScore: 8.7,
+      engagementRate: 15.2,
+      growthRate: 24.0,
+      videosPublished: 12,
+      newFollowers: 5600,
+      platformDistribution: { youtube: 60, tiktok: 40 },
+      performanceData: [
+        { date: 'Day 1', views: 1000 },
+        { date: 'Day 2', views: 1500 },
+        { date: 'Day 3', views: 1200 },
+        { date: 'Day 4', views: 1800 },
+        { date: 'Day 5', views: 2500 },
+        { date: 'Day 6', views: 2200 },
+        { date: 'Day 7', views: 3000 },
+      ],
+      createdAt: new Date(),
+    };
+    this.analytics.set(mockAnalytics.id, mockAnalytics);
 
+    // Create a Mock Trending Video
+    const mockVideo: TrendingVideo = {
+      id: this.currentVideoId++,
+      title: '"10 Productivity Hacks" went viral on TikTok',
+      platform: 'TikTok',
+      views: 45000,
+      viralScore: 9.2,
+      creator: 'Alex Creator',
+      category: 'Education',
+      thumbnailUrl: null, // You could add a real image URL here
+      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+    };
+    this.trendingVideos.set(mockVideo.id, mockVideo);
+  }
+
+  // (The rest of the methods are unchanged)
   async getUser(id: number): Promise<User | undefined> {
     return this.users.get(id);
   }
@@ -57,7 +98,6 @@ export class MemStorage implements IStorage {
     return [...this.users.values()].find(u => u.username === username);
   }
   async createUser(user: InsertUser): Promise<User> {
-    // Assuming password is required on insert
     const newUser: User = { ...user, id: this.currentUserId++, password: user.password! };
     this.users.set(newUser.id, newUser);
     return newUser;
@@ -95,12 +135,9 @@ export class MemStorage implements IStorage {
   }
   async createProject(project: InsertProject): Promise<Project> {
     const newProject: Project = {
-      // Establish all defaults first
       description: null,
       progress: 0,
-      // Spread incoming data
       ...project,
-      // Enforce non-nullable fields and add generated values
       id: this.currentProjectId++,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -116,12 +153,11 @@ export class MemStorage implements IStorage {
     return updated;
   }
   async getLatestAnalytics(): Promise<Analytics | undefined> {
-    const allAnalytics = [...this.analytics.values()];
-    return allAnalytics.length > 0 ? allAnalytics[allAnalytics.length - 1] : undefined;
+    const allAnalytics = [...this.analytics.values()].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return allAnalytics.length > 0 ? allAnalytics[0] : undefined;
   }
   async createAnalytics(analyticsData: InsertAnalytics): Promise<Analytics> {
     const newAnalytics: Analytics = {
-      // Establish all defaults first
       totalViews: 0,
       viralScore: 0,
       engagementRate: 0,
@@ -130,9 +166,7 @@ export class MemStorage implements IStorage {
       newFollowers: 0,
       platformDistribution: null,
       performanceData: null,
-      // Spread incoming data
       ...analyticsData,
-      // Enforce non-nullable fields and add generated values
       id: this.currentAnalyticsId++,
       createdAt: new Date(),
     };
