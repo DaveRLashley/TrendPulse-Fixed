@@ -13,7 +13,6 @@ export default function Analytics() {
   const { data: analytics, isLoading } = useQuery<AnalyticsType>({
     queryKey: [`${API_BASE_URL}/api/analytics`],
     queryFn: async () => {
-      // --- THIS LINE IS THE ONLY CHANGE ---
       const response = await fetch(`${API_BASE_URL}/api/analytics`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -22,7 +21,6 @@ export default function Analytics() {
     }
   });
 
-  // Note: In a real app, this data would come from the /api/trending-videos endpoint
   const topPerformingVideos = [
     { title: "My 5AM Morning Routine", platform: "YouTube", views: "2.1M", engagement: "18.2%", viralScore: 9.2 },
     { title: "iPhone Tips You Don't Know", platform: "TikTok", views: "1.8M", engagement: "22.1%", viralScore: 9.8 },
@@ -82,7 +80,7 @@ export default function Analytics() {
             <div className="text-sm text-muted-foreground">New Followers</div>
           </div>
         </CardContent>
-      </A>
+      </Card> {/* <-- THIS IS THE CORRECTED CLOSING TAG */}
 
       {/* Analytics Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
