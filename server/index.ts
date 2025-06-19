@@ -26,12 +26,12 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-  baseURL: process.env.OPENAI_API_BASE_URL,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 const server = createServer(app);
 
+// Pass the imported storage and openai instances into the routes function
 registerRoutes(app, openai, storage);
 
 const PORT = process.env.PORT || 3001;
