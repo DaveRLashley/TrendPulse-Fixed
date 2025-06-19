@@ -1,4 +1,4 @@
-// src/pages/Dashboard.tsx
+import { useMemo } from 'react'; // Make sure useMemo is imported
 import { useQuery } from "@tanstack/react-query";
 import { Eye, Flame, Users, TrendingUp } from "lucide-react";
 import { StatsCard } from "@/components/StatsCard";
@@ -20,7 +20,21 @@ export default function Dashboard() {
     }
   });
 
-  // Note: In a real app, recent activity would be its own API call
+  // --- START: Defensive Data Preparation ---
+  const dailyChartData = useMemo(() => {
+    if (!analytics?.performanceData?.daily) return [];
+    return analytics.performanceData.daily.map((views, index) => ({ name: `Day ${index + 1}`, views }));
+  }, [analytics]);
+
+  const platformChartData = useMemo(() => {
+    if (!analytics?.platformDistribution) return [];
+    return [
+      { name: 'YouTube', value: analytics.platformDistribution.youtube ?? 0 },
+      { name: 'TikTok', value: analytics.platformDistribution.tiktok ?? 0 },
+    ];
+  }, [analytics]);
+  // --- END: Defensive Data Preparation ---
+
   const recentActivity = [
     { text: '"10 Productivity Hacks" went viral on TikTok', time: '2 hours ago', views: '45K views', type: 'Viral', color: 'bg-green-500' },
     { text: 'AI generated 5 new title suggestions', time: '4 hours ago', type: 'New', color: 'bg-blue-500' },
@@ -30,7 +44,6 @@ export default function Dashboard() {
   if (isLoading) {
     return (
       <div className="p-6">
-        {/* Loading Skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-pulse">
           {[...Array(4)].map((_, i) => ( <div key={i} className="bg-muted rounded-xl h-32"></div> ))}
         </div>
@@ -69,14 +82,14 @@ export default function Dashboard() {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <div className="lg:col-span-3">
-          <PerformanceChart title="Performance Overview" data={analytics.performanceData.daily.map((views, index) => ({ name: `Day ${index + 1}`, views }))} type="line"/>
+          {dailyChartData.length > 0 && (
+            <PerformanceChart title="Performance Overview" data={dailyChartData} type="line"/>
+          )}
         </div>
         <div className="lg:col-span-2">
-          <PerformanceChart title="Platform Distribution" data={[
-              { name: 'YouTube', value: analytics.platformDistribution.youtube },
-              { name: 'TikTok', value: analytics.platformDistribution.tiktok },
-              { name: 'Instagram', value: analytics.platformDistribution.instagram },
-            ]} type="doughnut"/>
+          {platformChartData.length > 0 && (
+            <PerformanceChart title="Platform Distribution" data={platformChartData} type="doughnut"/>
+          )}
         </div>
       </div>
 

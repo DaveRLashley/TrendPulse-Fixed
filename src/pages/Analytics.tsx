@@ -1,4 +1,4 @@
-// src/pages/Analytics.tsx
+import { useMemo } from 'react'; // Make sure useMemo is imported
 import { useQuery } from "@tanstack/react-query";
 import { Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +21,21 @@ export default function Analytics() {
     }
   });
 
-  // This is mock data for the table, as the real data would come from a different API call
+  // --- START: Defensive Data Preparation ---
+  const weeklyChartData = useMemo(() => {
+    if (!analytics?.performanceData?.weekly) return [];
+    return analytics.performanceData.weekly.map((views, index) => ({ name: `Week ${index + 1}`, views }));
+  }, [analytics]);
+
+  const platformChartData = useMemo(() => {
+    if (!analytics?.platformDistribution) return [];
+    return [
+      { name: 'YouTube', value: analytics.platformDistribution.youtube ?? 0 },
+      { name: 'TikTok', value: analytics.platformDistribution.tiktok ?? 0 },
+    ];
+  }, [analytics]);
+  // --- END: Defensive Data Preparation ---
+
   const topPerformingVideos = [
     { title: "My 5AM Morning Routine", platform: "YouTube", views: "2.1M", engagement: "18.2%", viralScore: 9.2 },
     { title: "iPhone Tips You Don't Know", platform: "TikTok", views: "1.8M", engagement: "22.1%", viralScore: 9.8 },
@@ -85,14 +99,12 @@ export default function Analytics() {
 
       {/* Analytics Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <PerformanceChart title="Weekly Views" data={analytics.performanceData.weekly.map((views, index) => ({ name: `Week ${index + 1}`, views }))} type="bar" />
-        {/* --- START: THIS IS THE ONLY CHANGE --- */}
-        {/* Correctly accesses only the data we know exists from the backend */}
-        <PerformanceChart title="Platform Distribution" data={[
-            { name: 'YouTube', value: analytics.platformDistribution.youtube },
-            { name: 'TikTok', value: analytics.platformDistribution.tiktok },
-          ]} type="doughnut" />
-        {/* --- END: THIS IS THE ONLY CHANGE --- */}
+        {weeklyChartData.length > 0 && (
+          <PerformanceChart title="Weekly Views" data={weeklyChartData} type="bar" />
+        )}
+        {platformChartData.length > 0 && (
+          <PerformanceChart title="Platform Distribution" data={platformChartData} type="doughnut" />
+        )}
       </div>
 
       {/* Top Performing Content */}
