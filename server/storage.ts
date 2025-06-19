@@ -42,11 +42,11 @@ export class MemStorage implements IStorage {
   private initializeData() {
     // Corrected sample videos list
     const sampleVideos: Omit<TrendingVideo, 'id'>[] = [
-      { title: "My Perfect Morning Routine for Productivity", platform: "youtube", views: 2100000, viralScore: 9.2, creator: "@productivityguru", category: "Lifestyle", thumbnailUrl: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=225", createdAt: new Date() },
+      { title: "My Perfect Morning Routine for Productivity", platform: "youtube", views: 2100000, viralScore: 9.2, creator: "@productivityguru", category: "Lifestyle", thumbnailUrl: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136", createdAt: new Date() },
       { title: "5 Minute Makeup Tutorial ✨", platform: "tiktok", views: 890000, viralScore: 8.7, creator: "@beautyhacks101", category: "Beauty", thumbnailUrl: "https://images.unsplash.com/photo-1611162617474-5b21e879e113", createdAt: new Date() },
       { title: "How I Gained 1M Followers in 30 Days", platform: "youtube", views: 1500000, viralScore: 9.5, creator: "@growthhacker", category: "Marketing", thumbnailUrl: "https://images.unsplash.com/photo-1586281380349-632531db7ed4", createdAt: new Date() },
-      { title: "Beginner’s Guide to Reels Editing 🎬", platform: "instagram", views: 620000, viralScore: 8.3, creator: "@editqueen", category: "Tech", thumbnailUrl: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=225", createdAt: new Date() },
-      { title: "Day in My Life as a Remote Dev", platform: "youtube", views: 450000, viralScore: 7.9, creator: "@codedaily", category: "Lifestyle", thumbnailUrl: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=225", createdAt: new Date() },
+      { title: "Beginner’s Guide to Reels Editing 🎬", platform: "instagram", views: 620000, viralScore: 8.3, creator: "@editqueen", category: "Tech", thumbnailUrl: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee", createdAt: new Date() },
+      { title: "Day in My Life as a Remote Dev", platform: "youtube", views: 450000, viralScore: 7.9, creator: "@codedaily", category: "Lifestyle", thumbnailUrl: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c", createdAt: new Date() },
       { title: "Viral TikTok Dance Explained", platform: "tiktok", views: 1340000, viralScore: 8.8, creator: "@trendspotter", category: "Entertainment", thumbnailUrl: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg", createdAt: new Date() }, // <-- SYNTAX FIXED HERE
     ];
     sampleVideos.forEach(video => this.createTrendingVideo(video));
