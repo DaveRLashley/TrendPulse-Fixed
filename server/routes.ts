@@ -7,58 +7,118 @@ export function registerRoutes(
   openai: OpenAI,
   storage: IStorage
 ) {
-  // Create Project
-  app.post("/projects", async (req, res) => {
+  // AI Suggestions (POST)
+  app.post("/api/ai-suggestions", async (req, res) => {
     try {
-      const project = await storage.createProject(req.body);
-      res.json(project);
+      const prompt = req.body.prompt;
+      const completion = await openai.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert content strategist who suggests viral short-form video ideas.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        model: "gpt-4",
+      });
+      res.json({ suggestions: completion.choices[0].message.content });
     } catch (err) {
-      console.error("createProject error:", err);
-      res.status(500).json({ error: "Failed to create project" });
+      console.error("AI Suggestion Error:", err);
+      res.status(500).json({ error: "AI suggestion failed" });
     }
   });
 
-  // Get All Projects
-  app.get("/projects", async (req, res) => {
+  // Analyze Content (POST)
+  app.post("/api/analyze-content", async (req, res) => {
     try {
-      const projects = await storage.getProjects();
-      res.json(projects);
+      const prompt = req.body.prompt;
+      const completion = await openai.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: "You are a content analyst that evaluates the quality and structure of short-form video scripts.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        model: "gpt-4",
+      });
+      res.json({ analysis: completion.choices[0].message.content });
     } catch (err) {
-      console.error("getProjects error:", err);
-      res.status(500).json({ error: "Failed to get projects" });
+      console.error("Content Analysis Error:", err);
+      res.status(500).json({ error: "Content analysis failed" });
     }
   });
 
-  // Get Trending Videos
-  app.get("/trending", async (_req, res) => {
+  // Trending Videos (GET)
+  app.get("/api/trending-videos", async (_req, res) => {
     try {
       const videos = await storage.getTrendingVideos();
       res.json(videos);
     } catch (err) {
-      console.error("getTrendingVideos error:", err);
-      res.status(500).json({ error: "Failed to get trending videos" });
+      console.error("Trending Video Error:", err);
+      res.status(500).json({ error: "Failed to fetch trending videos" });
     }
   });
 
-  // Get Analytics
-  app.get("/analytics", async (_req, res) => {
+  // Analytics (GET)
+  app.get("/api/analytics", async (_req, res) => {
     try {
       const analytics = await storage.getAnalytics();
       res.json(analytics);
     } catch (err) {
-      console.error("getAnalytics error:", err);
-      res.status(500).json({ error: "Failed to get analytics" });
+      console.error("Analytics Error:", err);
+      res.status(500).json({ error: "Failed to fetch analytics" });
     }
   });
 
-  // Content Suggestions
-  app.get("/suggestions", async (_req, res) => {
+  // Content Suggestions (GET)
+  app.get("/api/content-suggestions", async (_req, res) => {
     try {
       const suggestions = await storage.getContentSuggestions();
       res.json(suggestions);
     } catch (err) {
-      console.error("getContentSuggestions error:", err);
-      res.status(500).json({ error: "Failed to get suggestions" });
+      console.error("Suggestions Error:", err);
+      res.status(500).json({ error: "Failed to fetch suggestions" });
+    }
+  });
+
+  // All Projects (GET)
+  app.get("/api/projects", async (_req, res) => {
+    try {
+      const projects = await storage.getProjects();
+      res.json(projects);
+    } catch (err) {
+      console.error("Get Projects Error:", err);
+      res.status(500).json({ error: "Failed to fetch projects" });
+    }
+  });
+
+  // Single Project by ID (GET)
+  app.get("/api/projects/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const project = await storage.getProjectById(id);
+      res.json(project);
+    } catch (err) {
+      console.error("Get Project Error:", err);
+      res.status(500).json({ error: "Failed to fetch project" });
+    }
+  });
+
+  // Create New Project (POST)
+  app.post("/api/projects", async (req, res) => {
+    try {
+      const project = await storage.createProject(req.body);
+      res.json(project);
+    } catch (err) {
+      console.error("Create Project Error:", err);
+      res.status(500).json({ error: "Failed to create project" });
     }
   });
 }
