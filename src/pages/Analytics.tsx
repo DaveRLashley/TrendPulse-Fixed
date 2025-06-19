@@ -13,7 +13,8 @@ export default function Analytics() {
   const { data: analytics, isLoading } = useQuery<AnalyticsType>({
     queryKey: [`${API_BASE_URL}/api/analytics`],
     queryFn: async () => {
-      const response = await fetch(`${API_...`);
+      // --- THIS LINE IS THE ONLY CHANGE ---
+      const response = await fetch(`${API_BASE_URL}/api/analytics`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -21,6 +22,7 @@ export default function Analytics() {
     }
   });
 
+  // Note: In a real app, this data would come from the /api/trending-videos endpoint
   const topPerformingVideos = [
     { title: "My 5AM Morning Routine", platform: "YouTube", views: "2.1M", engagement: "18.2%", viralScore: 9.2 },
     { title: "iPhone Tips You Don't Know", platform: "TikTok", views: "1.8M", engagement: "22.1%", viralScore: 9.8 },
@@ -44,23 +46,51 @@ export default function Analytics() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* ...Header and Key Metrics sections are unchanged... */}
+      {/* Analytics Header */}
       <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl font-bold">Performance Analytics</CardTitle>
-                {/* ...other elements... */}
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-2xl font-bold">Performance Analytics</CardTitle>
+            <div className="flex items-center space-x-2">
+              <Select defaultValue="30">
+                <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7">Last 7 days</SelectItem>
+                  <SelectItem value="30">Last 30 days</SelectItem>
+                  <SelectItem value="90">Last 90 days</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button><Download className="w-4 h-4 mr-2" />Export</Button>
             </div>
-          </CardHeader>
-          <CardContent>
-            {/* ...other elements... */}
-          </CardContent>
-      </Card>
-
+          </div>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-center p-4 bg-muted/50 rounded-lg">
+            <div className="text-2xl font-bold text-foreground">{analytics.videosPublished}</div>
+            <div className="text-sm text-muted-foreground">Videos Published</div>
+          </div>
+          <div className="text-center p-4 bg-muted/50 rounded-lg">
+            <div className="text-2xl font-bold text-foreground">{formatNumber(analytics.totalViews)}</div>
+            <div className="text-sm text-muted-foreground">Total Views</div>
+          </div>
+          <div className="text-center p-4 bg-muted/50 rounded-lg">
+            <div className="text-2xl font-bold text-foreground">{analytics.engagementRate}%</div>
+            <div className="text-sm text-muted-foreground">Avg Engagement</div>
+          </div>
+          <div className="text-center p-4 bg-muted/50 rounded-lg">
+            <div className="text-2xl font-bold text-foreground">{formatNumber(analytics.newFollowers)}</div>
+            <div className="text-sm text-muted-foreground">New Followers</div>
+          </div>
+        </CardContent>
+      </A>
 
       {/* Analytics Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* ...Charts are unchanged... */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <PerformanceChart title="Weekly Views" data={analytics.performanceData.weekly.map((views, index) => ({ name: `Week ${index + 1}`, views }))} type="bar" />
+        <PerformanceChart title="Platform Distribution" data={[
+            { name: 'YouTube', value: analytics.platformDistribution.youtube },
+            { name: 'TikTok', value: analytics.platformDistribution.tiktok },
+          ]} type="doughnut" />
       </div>
 
       {/* Top Performing Content */}
@@ -83,7 +113,6 @@ export default function Analytics() {
                   <tr key={index}>
                     <td className="py-3 font-medium text-foreground">{video.title}</td>
                     <td className="py-3">
-                      {/* --- START: THIS IS THE ONLY CHANGE --- */}
                       <Badge 
                         variant="outline"
                         className={
@@ -94,7 +123,6 @@ export default function Analytics() {
                       >
                         {video.platform}
                       </Badge>
-                      {/* --- END: THIS IS THE ONLY CHANGE --- */}
                     </td>
                     <td className="py-3 text-muted-foreground">{video.views}</td>
                     <td className="py-3 text-muted-foreground">{video.engagement}</td>
