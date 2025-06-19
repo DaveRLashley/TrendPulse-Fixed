@@ -76,7 +76,7 @@ export function registerRoutes(app: Express, openai: OpenAI, storage: IStorage) 
   });
 
   // --- NEWLY ADDED AND IMPLEMENTED ROUTE ---
-  app.post("/api/analyze", async (req, res) => {
+  app.post("/api/analyze-content", async (req, res) => {
     try {
       const { content } = req.body;
       if (!content) {
