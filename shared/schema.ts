@@ -1,4 +1,14 @@
-// Minimal example. Replace with real shared types.
+import { z } from "zod";
+
+// Zod schema for project validation
+export const insertProjectSchema = z.object({
+  title: z.string(),
+  description: z.string().nullable().optional(),
+  status: z.enum(["planning", "in-progress", "completed"]),
+  progress: z.number().min(0).max(100).optional(),
+});
+
+// TypeScript types for shared data structures
 export type Project = {
   id: number;
   title: string;
