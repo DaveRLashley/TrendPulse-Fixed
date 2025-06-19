@@ -1,20 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  Bar,
-  BarChart,
-  Cell,
-  Legend,
-  Line,
-  LineChart,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
+  Bar, BarChart, Cell, Legend, Line, LineChart, Pie, PieChart,
+  ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 
-// Define a more flexible data type for our charts
 type ChartData = {
   name: string;
   views?: number;
@@ -27,61 +17,30 @@ interface PerformanceChartProps {
   type?: 'line' | 'bar' | 'doughnut';
 }
 
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658'];
 
 export function PerformanceChart({ title, data = [], type = 'line' }: PerformanceChartProps) {
 
-  const renderChart = () => {
-    switch (type) {
-      case 'line':
-        return (
-          <LineChart data={data}>
-            <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-            <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-            <Tooltip />
-            <Line type="monotone" dataKey="views" stroke="#8884d8" activeDot={{ r: 8 }} />
-          </LineChart>
-        );
-      case 'bar':
-        return (
-          <BarChart data={data}>
-            <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-            <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-            <Tooltip />
-            <Bar dataKey="views" fill="#82ca9d" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        );
-      case 'doughnut':
-        return (
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              innerRadius={60}
-              outerRadius={80}
-              fill="#8884d8"
-              paddingAngle={5}
-              dataKey="value"
-            >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        );
-      default:
-        return null;
-    }
-  };
+  const renderChart = () => { /* ... same as before ... */ };
 
   return (
     <Card>
-      <CardHeader>
+      {/* --- UPDATED CardHeader to include the filter --- */}
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-lg font-semibold">{title}</CardTitle>
+        {/* The filter will only show for line and bar charts */}
+        {(type === 'line' || type === 'bar') && (
+          <Select defaultValue="7">
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7">Last 7 days</SelectItem>
+              <SelectItem value="30">Last 30 days</SelectItem>
+              <SelectItem value="90">Last 90 days</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={250}>

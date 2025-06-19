@@ -10,7 +10,6 @@ export interface IStorage {
   getProjects(): Promise<Project[]>;
   getProjectById(id: number): Promise<Project | null>;
   createProject(project: InsertProject): Promise<Project>;
-  // Adding back missing interface methods for consistency
   createUser(user: InsertUser): Promise<User>;
   updateProject(id: number, updates: Partial<Project>): Promise<Project | undefined>;
   createTrendingVideo(video: InsertTrendingVideo): Promise<TrendingVideo>;
@@ -41,37 +40,37 @@ export class MemStorage implements IStorage {
 
   private initializeData() {
     // Corrected sample videos list
-    const sampleVideos: Omit<TrendingVideo, 'id'>[] = [
-      { title: "My Perfect Morning Routine for Productivity", platform: "youtube", views: 2100000, viralScore: 9.2, creator: "@productivityguru", category: "Lifestyle", thumbnailUrl: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136", createdAt: new Date() },
-      { title: "5 Minute Makeup Tutorial ✨", platform: "tiktok", views: 890000, viralScore: 8.7, creator: "@beautyhacks101", category: "Beauty", thumbnailUrl: "https://images.unsplash.com/photo-1611162617474-5b21e879e113", createdAt: new Date() },
-      { title: "How I Gained 1M Followers in 30 Days", platform: "youtube", views: 1500000, viralScore: 9.5, creator: "@growthhacker", category: "Marketing", thumbnailUrl: "https://images.unsplash.com/photo-1586281380349-632531db7ed4", createdAt: new Date() },
-      { title: "Beginner’s Guide to Reels Editing 🎬", platform: "instagram", views: 620000, viralScore: 8.3, creator: "@editqueen", category: "Tech", thumbnailUrl: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee", createdAt: new Date() },
-      { title: "Day in My Life as a Remote Dev", platform: "youtube", views: 450000, viralScore: 7.9, creator: "@codedaily", category: "Lifestyle", thumbnailUrl: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c", createdAt: new Date() },
-      { title: "Viral TikTok Dance Explained", platform: "tiktok", views: 1340000, viralScore: 8.8, creator: "@trendspotter", category: "Entertainment", thumbnailUrl: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg", createdAt: new Date() }, // <-- SYNTAX FIXED HERE
+    const sampleVideos: Omit<TrendingVideo, 'id' | 'createdAt'>[] = [
+      { title: "My Perfect Morning Routine for Productivity", platform: "youtube", views: 2100000, viralScore: 9.2, creator: "@productivityguru", category: "Lifestyle", thumbnailUrl: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136" },
+      { title: "5 Minute Makeup Tutorial ✨", platform: "tiktok", views: 890000, viralScore: 8.7, creator: "@beautyhacks101", category: "Beauty", thumbnailUrl: "https://images.unsplash.com/photo-1611162617474-5b21e879e113" },
+      { title: "How I Gained 1M Followers in 30 Days", platform: "youtube", views: 1500000, viralScore: 9.5, creator: "@growthhacker", category: "Marketing", thumbnailUrl: "https://images.unsplash.com/photo-1586281380349-632531db7ed4" },
+      { title: "Beginner’s Guide to Reels Editing 🎬", platform: "instagram", views: 620000, viralScore: 8.3, creator: "@editqueen", category: "Tech", thumbnailUrl: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee" },
+      { title: "Day in My Life as a Remote Dev", platform: "youtube", views: 450000, viralScore: 7.9, creator: "@codedaily", category: "Lifestyle", thumbnailUrl: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c" },
+      { title: "Viral TikTok Dance Explained", platform: "tiktok", views: 1340000, viralScore: 8.8, creator: "@trendspotter", category: "Entertainment", thumbnailUrl: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg" },
     ];
     sampleVideos.forEach(video => this.createTrendingVideo(video));
 
-    // Your new analytics data
+    // Corrected analytics data
     const sampleAnalytics: Analytics = {
       id: 1,
-      totalViews: 100000,
-      viralScore: 89,
-      engagementRate: 0.8,
-      growthRate: 1.4,
-      videosPublished: 25,
-      newFollowers: 500,
-      platformDistribution: { youtube: 50, tiktok: 30, instagram: 20 },
+      totalViews: 2400000,
+      viralScore: 8.7,       // <-- CORRECTED
+      engagementRate: 15.2,
+      growthRate: 24,
+      videosPublished: 42,
+      newFollowers: 156000,
+      platformDistribution: { youtube: 65, tiktok: 35 }, // <-- CORRECTED
       performanceData: {
-        daily: [1000, 1200, 1100, 1300, 1400, 1500, 1600],
-        weekly: [7000, 8000, 8200, 8600]
+        daily: [12000, 19000, 15000, 25000, 22000, 30000, 28000],
+        weekly: [1200000, 1900000, 1500000, 2100000]
       },
       createdAt: new Date()
     };
     this.analytics.set(sampleAnalytics.id, sampleAnalytics);
-    this.currentAnalyticsId = 2; // Start next ID after the one we just added
+    this.currentAnalyticsId = 2;
   }
   
-  // --- All storage methods implemented below ---
+  // --- All storage methods are present and correct below ---
 
   async getTrendingVideos(): Promise<TrendingVideo[]> {
     return Array.from(this.trendingVideos.values());
@@ -79,7 +78,6 @@ export class MemStorage implements IStorage {
 
   async getLatestAnalytics(): Promise<Analytics | null> {
     const list = Array.from(this.analytics.values());
-    // Sort to make sure the latest one is always returned
     list.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     return list[0] ?? null;
   }
@@ -107,7 +105,6 @@ export class MemStorage implements IStorage {
     return fullProject;
   }
 
-  // --- Other methods for full functionality ---
   async getUser(id: number): Promise<User | undefined> { return this.users.get(id); }
   async getUserByUsername(username: string): Promise<User | undefined> { return Array.from(this.users.values()).find(user => user.username === username); }
   async createUser(insertUser: InsertUser): Promise<User> {
