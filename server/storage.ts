@@ -28,10 +28,10 @@ export class MemStorage implements IStorage {
     // UPDATED: Removed Instagram video, now 5 total
     const sampleVideos: Omit<TrendingVideo, 'id' | 'createdAt'>[] = [
       { title: "My Perfect Morning Routine", platform: "youtube", views: 2100000, viralScore: 9.2, creator: "@productivityguru", category: "Lifestyle", thumbnailUrl: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136" },
-      { title: "5 Best Netflix Shows ✨", platform: "tiktok", views: 890000, viralScore: 8.7, creator: "@watchhacks101", category: "Beauty", thumbnailUrl: "https://images.unsplash.com/photo-1611162617474-5b21e879e113" },
+      { title: "Top Netflix Shows ✨", platform: "tiktok", views: 890000, viralScore: 8.7, creator: "@watchhacks101", category: "Beauty", thumbnailUrl: "https://images.unsplash.com/photo-1611162617474-5b21e879e113" },
       { title: "How I Landed My Dream Job", platform: "youtube", views: 1500000, viralScore: 9.5, creator: "@growthhacker", category: "Marketing", thumbnailUrl: "https://images.unsplash.com/photo-1586281380349-632531db7ed4" },
       { title: "Day in My Life as a Dev", platform: "youtube", views: 450000, viralScore: 7.9, creator: "@codedaily", category: "Lifestyle", thumbnailUrl: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c" },
-      { title: "Amazing abs in 30 Days", platform: "tiktok", views: 1340000, viralScore: 8.8, creator: "@trendspotter", category: "Entertainment", thumbnailUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b" },
+      { title: "Amazing Abs in 30 Days", platform: "tiktok", views: 1340000, viralScore: 8.8, creator: "@trendspotter", category: "Entertainment", thumbnailUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b" },
     ];
     sampleVideos.forEach(video => this.createTrendingVideo(video));
 

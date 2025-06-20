@@ -28,11 +28,12 @@ export function VideoCard({ video, onAnalyze }: VideoCardProps) {
   return (
     <Card className="overflow-hidden">
       {video.thumbnailUrl && (
-        <img 
-          src={video.thumbnailUrl} 
-          alt={video.title}
-          className="w-full h-auto max-h-48 object-contain"
-        />
+      <img 
+  src={video.thumbnailUrl} 
+  alt={video.title}
+  className="w-full h-48 object-cover object-top"
+/>
+
       )}
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-2">
