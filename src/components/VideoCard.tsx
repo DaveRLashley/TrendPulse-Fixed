@@ -32,7 +32,7 @@ export function VideoCard({ video, onAnalyze }: VideoCardProps) {
           <img 
             src={video.thumbnailUrl} 
             alt={video.title}
-            className="w-full h-full object-cover object-top"
+            className="w-full h-48 object-cover"
           />
         </div>
       )}
