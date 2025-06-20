@@ -1,30 +1,22 @@
-import { useMemo } from 'react'; // Make sure useMemo is imported
-import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from 'react';
 import { Eye, Flame, Users, TrendingUp } from "lucide-react";
 import { StatsCard } from "@/components/StatsCard";
 import { PerformanceChart } from "@/components/PerformanceChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { Analytics } from "@/types";
-import API_BASE_URL from '@/lib/api';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { useAnalytics } from '@/context/AnalyticsContext';
 
 export default function Dashboard() {
-  const { data: analytics, isLoading } = useQuery<Analytics>({
-    queryKey: [`${API_BASE_URL}/api/analytics`],
-    queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/api/analytics`);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    }
-  });
+  const { analytics, isLoading } = useAnalytics();
+  const [selectedDays, setSelectedDays] = useState(7);
 
   // --- START: Defensive Data Preparation ---
   const dailyChartData = useMemo(() => {
     if (!analytics?.performanceData?.daily) return [];
-    return analytics.performanceData.daily.map((views, index) => ({ name: `Day ${index + 1}`, views }));
-  }, [analytics]);
+    const sliced = analytics.performanceData.daily.slice(-selectedDays);
+    return sliced.map((views, index) => ({ name: `Day ${index + 1}`, views }));
+  }, [analytics, selectedDays]);
 
   const platformChartData = useMemo(() => {
     if (!analytics?.platformDistribution) return [];
@@ -45,7 +37,7 @@ export default function Dashboard() {
     return (
       <div className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-pulse">
-          {[...Array(4)].map((_, i) => ( <div key={i} className="bg-muted rounded-xl h-32"></div> ))}
+          {[...Array(4)].map((_, i) => (<div key={i} className="bg-muted rounded-xl h-32"></div>))}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8 animate-pulse">
           <div className="lg:col-span-3 bg-muted rounded-xl h-80"></div>
@@ -81,7 +73,20 @@ export default function Dashboard() {
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3 space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-semibold">Performance Overview</h2>
+            <Select value={selectedDays.toString()} onValueChange={(value) => setSelectedDays(Number(value))}>
+              <SelectTrigger className="w-[120px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7">Last 7 days</SelectItem>
+                <SelectItem value="30">Last 30 days</SelectItem>
+                <SelectItem value="90">Last 90 days</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           {dailyChartData.length > 0 && (
             <PerformanceChart title="Performance Overview" data={dailyChartData} type="line"/>
           )}
