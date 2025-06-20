@@ -1,4 +1,5 @@
-import { useMemo } from 'react'; // Make sure useMemo is imported
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,11 @@ import type { Analytics as AnalyticsType } from "@/types";
 import API_BASE_URL from '@/lib/api';
 
 export default function Analytics() {
+  const { data: analytics, isLoading } = useQuery<AnalyticsType>({
+    queryKey: ["analytics"],
+    queryFn: async () => {
+      const response = await fetch(`${API_BASE_URL}/api/analytics`);
+      if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       return response.json();
