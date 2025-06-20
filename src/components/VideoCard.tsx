@@ -26,16 +26,17 @@ export function VideoCard({ video, onAnalyze }: VideoCardProps) {
   };
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden flex flex-col h-full">
       {video.thumbnailUrl && (
-      <img 
-  src={video.thumbnailUrl} 
-  alt={video.title}
-  className="w-full h-48 object-cover object-top"
-/>
-
+        <div className="h-48 w-full overflow-hidden">
+          <img 
+            src={video.thumbnailUrl} 
+            alt={video.title}
+            className="w-full h-full object-cover object-top"
+          />
+        </div>
       )}
-      <CardContent className="p-4">
+      <CardContent className="p-4 flex flex-col flex-grow">
         <div className="flex items-center justify-between mb-2">
           <Badge className={platformColors[video.platform]}>
             {video.platform === 'youtube' ? 'YouTube' : 'TikTok'}
@@ -48,7 +49,7 @@ export function VideoCard({ video, onAnalyze }: VideoCardProps) {
           {video.title}
         </h4>
         <p className="text-sm text-muted-foreground mb-3">{video.creator}</p>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-auto">
           <div className="flex items-center text-xs text-muted-foreground">
             <Flame className="w-4 h-4 text-warning mr-1" />
             Viral Score: {video.viralScore}
