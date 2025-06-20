@@ -14,17 +14,17 @@ export default function Analytics() {
     queryKey: ["analytics"],
     queryFn: async () => {
       const response = await fetch(`${API_BASE_URL}/api/analytics`);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+      if (!response.ok) throw new Error('Network response was not ok');
       return response.json();
-    }
+    },
   });
 
-  // --- START: Defensive Data Preparation ---
   const weeklyChartData = useMemo(() => {
     if (!analytics?.performanceData?.weekly) return [];
-    return analytics.performanceData.weekly.map((views, index) => ({ name: `Week ${index + 1}`, views }));
+    return analytics.performanceData.weekly.map((views, index) => ({
+      name: `Week ${index + 1}`,
+      views,
+    }));
   }, [analytics]);
 
   const platformChartData = useMemo(() => {
@@ -34,7 +34,6 @@ export default function Analytics() {
       { name: 'TikTok', value: analytics.platformDistribution.tiktok ?? 0 },
     ];
   }, [analytics]);
-  // --- END: Defensive Data Preparation ---
 
   const topPerformingVideos = [
     { title: "My 5AM Morning Routine", platform: "YouTube", views: "2.1M", engagement: "18.2%", viralScore: 9.2 },
@@ -42,6 +41,12 @@ export default function Analytics() {
     { title: "30-Second Pasta Recipe", platform: "YouTube", views: "1.5M", engagement: "16.7%", viralScore: 9.5 },
     { title: "Dog Magic Trick Reaction", platform: "TikTok", views: "4.1M", engagement: "25.3%", viralScore: 9.7 }
   ];
+
+  const formatNumber = (num: number) => {
+    if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
+    if (num >= 1_000) return `${(num / 1_000).toFixed(0)}K`;
+    return num.toString();
+  };
 
   if (isLoading) {
     return <div className="p-6 animate-pulse"><div className="h-screen bg-muted rounded-xl"></div></div>;
@@ -51,15 +56,8 @@ export default function Analytics() {
     return <div className="p-6 text-center text-muted-foreground">No analytics data available</div>;
   }
 
-  const formatNumber = (num: number) => {
-    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-    if (num >= 1000) return `${(num / 1000).toFixed(0)}K`;
-    return num.toString();
-  };
-
   return (
     <div className="p-6 space-y-6">
-      {/* Analytics Header */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -97,7 +95,6 @@ export default function Analytics() {
         </CardContent>
       </Card>
 
-      {/* Analytics Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {weeklyChartData.length > 0 && (
           <PerformanceChart title="Weekly Views" data={weeklyChartData} type="bar" />
@@ -107,7 +104,6 @@ export default function Analytics() {
         )}
       </div>
 
-      {/* Top Performing Content */}
       <Card>
         <CardHeader><CardTitle>Top Performing Content</CardTitle></CardHeader>
         <CardContent>

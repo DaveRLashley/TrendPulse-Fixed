@@ -4,35 +4,29 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { VideoCard } from "@/components/VideoCard";
 import type { TrendingVideo } from "@/types";
-import API_BASE_URL from '@/lib/api'; // Or the correct relative path
+import API_BASE_URL from '@/lib/api';
 
 export default function TrendingContent() {
   const [platform, setPlatform] = useState("all");
   const [category, setCategory] = useState("all");
 
   const { data: videos, isLoading } = useQuery<TrendingVideo[]>({
-    // UPDATED queryKey to include the full base URL
-    queryKey: [`${API_BASE_URL}/api/trending-videos`, { platform, category }],
+    queryKey: ["trendingVideos", platform, category],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (platform !== 'all') params.append('platform', platform);
       if (category !== 'all') params.append('category', category);
-      
-      // UPDATED fetch call to use the full URL
+
       const response = await fetch(`${API_BASE_URL}/api/trending-videos?${params.toString()}`, {
         credentials: 'include'
       });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch trending videos');
-      }
-      
+
+      if (!response.ok) throw new Error('Failed to fetch trending videos');
       return response.json();
     }
   });
 
   const handleAnalyze = (video: TrendingVideo) => {
-    // Placeholder for analyze functionality
     console.log('Analyzing video:', video.title);
   };
 
@@ -57,7 +51,6 @@ export default function TrendingContent() {
 
   return (
     <div className="p-6">
-      {/* Filter Bar */}
       <Card className="mb-6">
         <CardContent className="p-6">
           <div className="flex flex-wrap items-center gap-4">
@@ -96,15 +89,10 @@ export default function TrendingContent() {
         </CardContent>
       </Card>
 
-      {/* Videos Grid */}
       {videos && videos.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {videos.map((video) => (
-            <VideoCard
-              key={video.id}
-              video={video}
-              onAnalyze={handleAnalyze}
-            />
+            <VideoCard key={video.id} video={video} onAnalyze={handleAnalyze} />
           ))}
         </div>
       ) : (

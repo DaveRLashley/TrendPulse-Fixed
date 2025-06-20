@@ -31,7 +31,7 @@ export function VideoCard({ video, onAnalyze }: VideoCardProps) {
         <img 
           src={video.thumbnailUrl} 
           alt={video.title}
-          className="w-full h-48 object-cover"
+          className="w-full h-auto max-h-48 object-contain"
         />
       )}
       <CardContent className="p-4">
