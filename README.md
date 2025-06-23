@@ -1,6 +1,6 @@
 # TrendPulse 📈
 
-An AI-powered dashboard that analyzes viral YouTube and TikTok Shorts and generates optimized titles, tags, hooks, and content strategies for creators.
+**TrendPulse is a browser-based, AI-powered dashboard** that analyzes viral YouTube and TikTok Shorts and generates optimized titles, tags, hooks, and content strategies for creators.
 
 ## 🚀 Live Demo
 
@@ -56,7 +56,7 @@ This project is a full-stack, multi-service application deployed on a modern clo
 
 ## 🚧 Project Story & Status
 
-TrendPulse began as a rapidly developed prototype on Replit to prove out a core concept. A significant part of this project then involved **migrating the application from its original monolithic architecture to a scalable, multi-service cloud environment.**
+TrendPulse began as a rapidly developed MVP (Minimum Viable Product) on Replit to prove out a core concept. A significant part of this project then involved **migrating the application from its original monolithic architecture to a scalable, multi-service cloud environment.**
 
 This process showcased critical, real-world engineering skills, including:
 - **Re-architecting** the backend build process from `tsc` to `esbuild`.
@@ -65,6 +65,12 @@ This process showcased critical, real-world engineering skills, including:
 - **Systematically resolving** a full-stack range of production errors, from build failures to frontend rendering crashes.
 
 This journey highlights not just fast prototyping, but also the engineering discipline required to transform a proof-of-concept into a stable, production-ready application.
+
+### Future Goals
+- **Full mobile compatibility and responsive design.**
+- Persistent database integration to replace in-memory storage.
+- User authentication and saved project history.
+- Deeper, multi-platform analytics.
 
 ---
 
