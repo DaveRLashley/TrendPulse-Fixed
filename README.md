@@ -7,6 +7,7 @@
 **[Click here to try TrendPulse](https://trendpulse-fixed.netlify.app/)**
 
 ![TrendPulse App Demo](./assets/demo.gif)
+*Note: This demo GIF was recorded during development. The live version features the most up-to-date UI and data.*
 
 ---
 
