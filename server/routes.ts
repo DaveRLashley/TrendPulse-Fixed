@@ -4,10 +4,14 @@ import type OpenAI from "openai";
 import { insertProjectSchema } from "../shared/schema";
 
 export function registerRoutes(app: Express, openai: OpenAI, storage: IStorage) {
-  // --- Your existing, working routes remain unchanged ---
-  app.get("/api/trending-videos", async (_req, res) => {
+  // --- Trending Content with Filters ---
+  app.get("/api/trending-videos", async (req, res) => {
     try {
-      const videos = await storage.getTrendingVideos();
+      const { platform, category } = req.query;
+      const videos = await storage.getTrendingVideos(
+        platform as string,
+        category as string
+      );
       res.json(videos);
     } catch (err) {
       console.error("GET /api/trending-videos failed:", err);
@@ -15,6 +19,7 @@ export function registerRoutes(app: Express, openai: OpenAI, storage: IStorage) 
     }
   });
 
+  // --- Analytics ---
   app.get("/api/analytics", async (_req, res) => {
     try {
       const analytics = await storage.getLatestAnalytics();
@@ -25,6 +30,7 @@ export function registerRoutes(app: Express, openai: OpenAI, storage: IStorage) 
     }
   });
 
+  // --- Projects (GET) ---
   app.get("/api/projects", async (_req, res) => {
     try {
       const projects = await storage.getProjects();
@@ -35,6 +41,7 @@ export function registerRoutes(app: Express, openai: OpenAI, storage: IStorage) 
     }
   });
 
+  // --- Projects (POST) ---
   app.post("/api/projects", async (req, res) => {
     try {
       const projectData = insertProjectSchema.parse(req.body);
@@ -46,7 +53,7 @@ export function registerRoutes(app: Express, openai: OpenAI, storage: IStorage) 
     }
   });
 
-  // --- START: UPDATED AI SUGGESTIONS ROUTE ---
+  // --- AI Suggestions (Mocked) ---
   app.post("/api/ai-suggestions", async (req, res) => {
     console.log("Serving MOCKED response for /api/ai-suggestions");
     const mockSuggestions = {
@@ -59,30 +66,27 @@ export function registerRoutes(app: Express, openai: OpenAI, storage: IStorage) 
       ],
       tags: ["productivity", "lifehack", "morningroutine", "motivation", "success", "entrepreneur", "devlife"],
       contentIdeas: [
-        { title: "The '2-Minute Rule'", description: "Explain how doing any task for just 2 minutes makes it easier to start and build momentum.", engagement: "High" },
-        { title: "Time blocking vs. Task Batching", description: "Compare and contrast two popular productivity methods with visual examples.", engagement: "Medium" },
-        { title: "Review of a Notion Template", description: "Showcase a popular Notion template for content creators and how you use it.", engagement: "High" }
+        {
+          title: "The '2-Minute Rule'",
+          description: "Explain how doing any task for just 2 minutes makes it easier to start and build momentum.",
+          engagement: "High"
+        },
+        {
+          title: "Time blocking vs. Task Batching",
+          description: "Compare and contrast two popular productivity methods with visual examples.",
+          engagement: "Medium"
+        },
+        {
+          title: "Review of a Notion Template",
+          description: "Showcase a popular Notion template for content creators and how you use it.",
+          engagement: "High"
+        }
       ]
     };
     res.status(200).json(mockSuggestions);
-
-    /*
-    // Original OpenAI code is commented out below so you can easily switch back later
-    try {
-      const { topic, platform, style } = req.body;
-      const prompt = `...`;
-      const completion = await openai.chat.completions.create({ ... });
-      const result = completion.choices[0].message.content;
-      res.status(200).json(JSON.parse(result || '{}'));
-    } catch (error) {
-      console.error("AI suggestion error:", error);
-      res.status(500).json({ error: "AI generation failed" });
-    }
-    */
   });
-  // --- END: UPDATED AI SUGGESTIONS ROUTE ---
 
-  // --- START: UPDATED CONTENT ANALYZER ROUTE ---
+  // --- Content Analyzer (Mocked) ---
   app.post("/api/analyze-content", async (req, res) => {
     console.log("Serving MOCKED response for /api/analyze-content");
     const mockAnalysis = {
@@ -94,33 +98,38 @@ export function registerRoutes(app: Express, openai: OpenAI, storage: IStorage) 
       ],
       viralTags: ["viral", "trending", "hacks", "mustsee", "lifechanging"],
       hookIdeas: [
-        { hook: "Start with a shocking statistic", description: "Did you know 90% of people make this mistake every day?", engagement: "Very High" },
-        { hook: "Ask a provocative question", description: "What if everything you know about [topic] is wrong?", engagement: "High" },
-        { hook: "Use the 'Before vs After' format", description: "Show a dramatic transformation related to the content.", engagement: "High" },
-        { hook: "Create urgency or FOMO", description: "This trick won't work much longer, here's why...", engagement: "Medium" },
-        { hook: "Use controversy or debate", description: "Everyone is wrong about [topic], and I can prove it.", engagement: "High" },
+        {
+          hook: "Start with a shocking statistic",
+          description: "Did you know 90% of people make this mistake every day?",
+          engagement: "Very High"
+        },
+        {
+          hook: "Ask a provocative question",
+          description: "What if everything you know about [topic] is wrong?",
+          engagement: "High"
+        },
+        {
+          hook: "Use the 'Before vs After' format",
+          description: "Show a dramatic transformation related to the content.",
+          engagement: "High"
+        },
+        {
+          hook: "Create urgency or FOMO",
+          description: "This trick won't work much longer, here's why...",
+          engagement: "Medium"
+        },
+        {
+          hook: "Use controversy or debate",
+          description: "Everyone is wrong about [topic], and I can prove it.",
+          engagement: "High"
+        }
       ],
       contentStrategy: {
-        bestTiming: "Post between 6-9 PM on weekdays.",
+        bestTiming: "Post between 6–9 PM on weekdays.",
         format: "Use fast cuts, on-screen text captions, and a trending audio track.",
         approach: "Focus on a single, powerful takeaway for the viewer."
       }
     };
     res.status(200).json(mockAnalysis);
-    
-    /*
-    // Original OpenAI code is commented out below
-    try {
-        const { content, platform } = req.body;
-        const prompt = `...`;
-        const completion = await openai.chat.completions.create({ ... });
-        const result = completion.choices[0]?.message?.content;
-        res.status(200).json(JSON.parse(result || '{}'));
-    } catch (error) {
-        console.error("Content analysis error:", error);
-        res.status(500).json({ error: "Content analysis failed" });
-    }
-    */
   });
-  // --- END: UPDATED CONTENT ANALYZER ROUTE ---
 }

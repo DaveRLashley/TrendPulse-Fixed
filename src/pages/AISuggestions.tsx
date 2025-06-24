@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import API_BASE_URL from '@/lib/api';
 
-// This interface matches the mocked data from your backend
 interface AISuggestion {
   titles: string[];
   tags: string[];
@@ -20,56 +19,44 @@ interface AISuggestion {
   }[];
 }
 
-// The API call function
 const generateContentSuggestions = async (params: { topic: string, platform: string, style: string }): Promise<AISuggestion> => {
-    const response = await fetch(`${API_BASE_URL}/api/ai-suggestions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params),
-    });
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate suggestions');
-    }
-    return response.json();
+  const response = await fetch(`${API_BASE_URL}/api/ai-suggestions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to generate suggestions');
+  }
+  return response.json();
 };
-
 
 export default function AISuggestions() {
   const [topic, setTopic] = useState("");
   const [platform, setPlatform] = useState("youtube");
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
-  // Restored the setter function for our state
   const [suggestions, setSuggestions] = useState<AISuggestion | null>(null);
-
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const generateMutation = useMutation({
     mutationFn: generateContentSuggestions,
     onSuccess: (data) => {
-      // Re-enabled this line to save the API results to our state
       setSuggestions(data);
       queryClient.invalidateQueries({ queryKey: ['/api/content-suggestions'] });
-      toast({
-        title: "Success!",
-        description: "AI suggestions generated successfully.",
-      });
+      toast({ title: "Success!", description: "AI suggestions generated successfully." });
     },
     onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to generate suggestions.",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
 
   const styleOptions = ["educational", "entertaining", "inspiring", "funny", "trending"];
 
   const toggleStyle = (style: string) => {
-    setSelectedStyles(prev => 
-      prev.includes(style) 
+    setSelectedStyles(prev =>
+      prev.includes(style)
         ? prev.filter(s => s !== style)
         : [...prev, style]
     );
@@ -77,7 +64,7 @@ export default function AISuggestions() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast({ title: "Copied!", description: "Title copied to clipboard." });
+    toast({ title: "Copied!", description: "Copied to clipboard." });
   };
 
   const handleGenerate = () => {
@@ -91,7 +78,7 @@ export default function AISuggestions() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* --- START: YOUR EXISTING UI FOR THE INPUT FORM (UNCHANGED) --- */}
+      {/* --- START: Input Form --- */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
@@ -126,7 +113,7 @@ export default function AISuggestions() {
               </Select>
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">
               Content Style
@@ -144,8 +131,8 @@ export default function AISuggestions() {
               ))}
             </div>
           </div>
-          
-          <Button 
+
+          <Button
             onClick={handleGenerate}
             disabled={generateMutation.isPending}
             className="w-full"
@@ -164,19 +151,17 @@ export default function AISuggestions() {
           </Button>
         </CardContent>
       </Card>
-      {/* --- END: YOUR EXISTING UI FOR THE INPUT FORM (UNCHANGED) --- */}
+      {/* --- END: Input Form --- */}
 
-
-      {/* --- START: NEW UI SECTION TO DISPLAY RESULTS --- */}
+      {/* --- START: Results --- */}
       {generateMutation.isSuccess && suggestions && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Title Suggestions */}
+          {/* Titles */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Hash className="w-5 h-5 mr-2 text-primary" />
                 Title Suggestions
-                <Badge variant="secondary" className="ml-2">AI Generated</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -184,32 +169,38 @@ export default function AISuggestions() {
                 {suggestions.titles?.map((title, index) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <p className="font-medium text-foreground flex-1">{title}</p>
-                    <Button variant="link" size="sm" onClick={() => copyToClipboard(title)}>Use This</Button>
+                    <Button variant="link" size="sm" onClick={() => copyToClipboard(title)}>
+                      Use This
+                    </Button>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          {/* Tag Recommendations */}
+          {/* Tags */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Hash className="w-5 h-5 mr-2 text-secondary" />
                 Trending Tags
-                <Badge variant="secondary" className="ml-2">Hot Trends</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2 mb-4">
                 {suggestions.tags?.map((tag, index) => (
-                  <Badge key={index} variant="outline" className={index < 3 ? "bg-primary/10 text-primary border-primary" : ""}>
+                  <Badge
+                    key={index}
+                    variant="outline"
+                    className="cursor-pointer bg-primary/10 text-primary border-primary"
+                    onClick={() => copyToClipboard(`#${tag}`)}
+                  >
                     #{tag}
                   </Badge>
                 ))}
               </div>
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <p className="text-sm text-muted-foreground">💡 Use 3-5 trending tags with 2-3 niche tags for optimal reach.</p>
+              <div className="p-3 bg-muted/50 rounded-lg text-sm text-muted-foreground">
+                💡 Click a tag to copy it to clipboard.
               </div>
             </CardContent>
           </Card>
@@ -220,7 +211,6 @@ export default function AISuggestions() {
               <CardTitle className="flex items-center">
                 <Lightbulb className="w-5 h-5 mr-2 text-warning" />
                 Content Ideas & Hooks
-                <Badge variant="secondary" className="ml-2">Creative</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -229,9 +219,19 @@ export default function AISuggestions() {
                   <div key={index} className="p-4 border border-border rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium text-foreground">{idea.title}</span>
-                      <Badge variant="outline" className="text-accent border-accent">{idea.engagement}</Badge>
+                      <Badge variant="outline" className="text-accent border-accent">
+                        {idea.engagement}
+                      </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">{idea.description}</p>
+                    <p className="text-sm text-muted-foreground mb-2">{idea.description}</p>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="p-0 h-auto"
+                      onClick={() => copyToClipboard(idea.description)}
+                    >
+                      Copy Idea
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -239,7 +239,7 @@ export default function AISuggestions() {
           </Card>
         </div>
       )}
-      {/* --- END: NEW UI SECTION TO DISPLAY RESULTS --- */}
+      {/* --- END: Results --- */}
     </div>
   );
 }
