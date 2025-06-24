@@ -1,67 +1,112 @@
-import type { Express } from "express";
-import type { IStorage } from "./storage";
-import type OpenAI from "openai";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import { VideoCard } from "@/components/VideoCard";
+import type { TrendingVideo } from "@/types";
+import API_BASE_URL from "@/lib/api";
 
-export function registerRoutes(app: Express, openai: OpenAI, storage: IStorage) {
-  // --- This route is now fixed to use the filters correctly ---
-  app.get("/api/trending-videos", async (req, res) => {
-    try {
-      const { platform, category } = req.query;
-      const videos = await storage.getTrendingVideos(platform as string, category as string);
-      res.json(videos);
-    } catch (err) {
-      console.error("GET /api/trending-videos failed:", err);
-      res.status(500).json({ error: "Failed to fetch trending videos" });
+export default function TrendingContent() {
+  const [platform, setPlatform] = useState("all");
+  const [category, setCategory] = useState("all");
+
+  const { data: videos, isLoading } = useQuery<TrendingVideo[]>({
+    queryKey: ["trendingVideos", platform, category],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (platform !== "all") params.append("platform", platform);
+      if (category !== "all") params.append("category", category);
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/trending-videos?${params.toString()}`,
+        { credentials: "include" }
+      );
+
+      if (!response.ok) throw new Error("Failed to fetch trending videos");
+      return response.json();
     }
   });
 
-  // --- All other working routes are preserved below ---
-  app.get("/api/analytics", async (_req, res) => {
-    try {
-      const analytics = await storage.getLatestAnalytics();
-      res.json(analytics);
-    } catch (err) {
-      console.error("GET /api/analytics failed:", err);
-      res.status(500).json({ error: "Failed to fetch analytics" });
-    }
-  });
-  app.get("/api/projects", async (_req, res) => {
-    try {
-      const projects = await storage.getProjects();
-      res.json(projects);
-    } catch (err) {
-      console.error("GET /api/projects failed:", err);
-      res.status(500).json({ error: "Failed to fetch projects" });
-    }
-  });
-  app.post("/api/projects", async (req, res) => {
-    try {
-      const projectData = insertProjectSchema.parse(req.body);
-      const newProject = await storage.createProject(projectData);
-      res.status(201).json(newProject);
-    } catch (err) {
-      console.error("POST /api/projects failed:", err);
-      res.status(500).json({ error: "Failed to create project" });
-    }
-  });
-  app.post("/api/ai-suggestions", async (req, res) => {
-    console.log("Serving MOCKED response for /api/ai-suggestions");
-    const mockSuggestions = {
-        titles: ["You Won't Believe This Productivity Hack!", "The SECRET to Waking Up Energized", "My 5AM Routine ACTUALLY Changed My Life"],
-        tags: ["productivity", "lifehack", "morningroutine", "motivation"],
-        contentIdeas: [{ title: "The '2-Minute Rule'", description: "Explain how doing any task for just 2 minutes makes it easier to start.", engagement: "High" }]
-    };
-    res.status(200).json(mockSuggestions);
-  });
-  app.post("/api/analyze-content", async (req, res) => {
-    console.log("Serving MOCKED response for /api/analyze-content");
-    const mockAnalysis = {
-        viralScore: 9,
-        optimizedTitles: ["This Simple Trick Changed Everything", "I Tried the Viral 'X' Method", "You're Using [Common Product] Wrong"],
-        viralTags: ["viral", "trending", "hacks", "mustsee"],
-        hookIdeas: [{ hook: "Start with a shocking statistic", description: "Did you know 90% of people do this?", engagement: "Very High" }],
-        contentStrategy: { bestTiming: "6-9 PM on weekdays.", format: "Use fast cuts and captions.", approach: "Focus on one powerful takeaway."}
-    };
-    res.status(200).json(mockAnalysis);
-  });
+  const handleAnalyze = (video: TrendingVideo) => {
+    console.log("Analyzing video:", video.title);
+  };
+
+  return (
+    <div className="p-6">
+      <Card className="mb-6">
+        <CardContent className="p-6">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center space-x-2">
+              <label className="text-sm font-medium text-foreground">Platform:</label>
+              <Select value={platform} onValueChange={setPlatform}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Select platform" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Platforms</SelectItem>
+                  <SelectItem value="youtube">YouTube Shorts</SelectItem>
+                  <SelectItem value="tiktok">TikTok</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <label className="text-sm font-medium text-foreground">Category:</label>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="entertainment">Entertainment</SelectItem>
+                  <SelectItem value="education">Education</SelectItem>
+                  <SelectItem value="lifestyle">Lifestyle</SelectItem>
+                  <SelectItem value="technology">Technology</SelectItem>
+                  <SelectItem value="food">Food</SelectItem>
+                  <SelectItem value="fitness">Fitness</SelectItem>
+                  <SelectItem value="beauty">Beauty</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="bg-white dark:bg-card rounded-xl border border-border overflow-hidden animate-pulse"
+            >
+              <div className="w-full h-48 bg-muted" />
+              <div className="p-4 space-y-3">
+                <div className="h-4 bg-muted rounded w-3/4" />
+                <div className="h-3 bg-muted rounded w-1/2" />
+                <div className="h-8 bg-muted rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : videos && videos.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {videos.map((video) => (
+            <VideoCard key={video.id} video={video} onAnalyze={handleAnalyze} />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">
+            No trending videos found for the selected filters.
+          </p>
+        </div>
+      )}
+    </div>
+  );
 }
