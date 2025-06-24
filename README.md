@@ -2,12 +2,12 @@
 
 **TrendPulse is a browser-based, AI-powered dashboard** that analyzes viral YouTube and TikTok Shorts and generates optimized titles, tags, hooks, and content strategies for creators.
 
+![TrendPulse App Demo](./assets/demo.gif)
+*Note: This demo GIF was recorded during development. The live version features the most up-to-date UI and data.*
+
 ## 🚀 Live Demo
 
 **[Click here to try TrendPulse](https://trendpulse-fixed.netlify.app/)**
-
-![TrendPulse App Demo](./assets/demo.gif)
-*Note: This demo GIF was recorded during development. The live version features the most up-to-date UI and data.*
 
 ## ⚠️ Important Note on Load Time
 
