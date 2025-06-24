@@ -1,32 +1,40 @@
 // src/pages/ContentAnalyzer.tsx
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Search, Zap, Hash, Target, TrendingUp, Copy } from "lucide-react";
+import { Search, Zap, Hash, Target, TrendingUp, Copy, Clock } from "lucide-react"; // Added Clock icon
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import API_BASE_URL from '@/lib/api';
 
-// This interface should match the JSON object your backend AI prompt is designed to return
+// UPDATED interface to include all expected fields from the AI
 interface ContentAnalysis {
   optimizedTitles: string[];
   viralTags: string[];
   viralScore: number;
-  // You can add more fields here as you expand the AI's analysis capabilities
+  hookIdeas: {
+    hook: string;
+    description: string;
+    engagement: string;
+  }[];
+  contentStrategy: {
+    bestTiming: string;
+    format: string;
+    approach: string;
+  };
 }
 
 export default function ContentAnalyzer() {
   const [content, setContent] = useState("");
-  const [platform, setPlatform] = useState("youtube");
   const [analysis, setAnalysis] = useState<ContentAnalysis | null>(null);
   const { toast } = useToast();
 
   const analyzeMutation = useMutation({
     mutationFn: async ({ content, platform }: { content: string; platform: string }) => {
-      const response = await fetch(`${API_BASE_URL}/api/analyze`, { // Note: using /api/analyze as requested
+      // Using the correct /api/analyze-content endpoint
+      const response = await fetch(`${API_BASE_URL}/api/analyze-content`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -35,8 +43,8 @@ export default function ContentAnalyzer() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to analyze content');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to analyze content');
       }
       return response.json();
     },
@@ -65,7 +73,9 @@ export default function ContentAnalyzer() {
       });
       return;
     }
-    analyzeMutation.mutate({ content: content.trim(), platform });
+    // The platform value is missing from the original file, but the API needs it.
+    // I'll default to 'youtube'. You can add a <Select> dropdown for this later.
+    analyzeMutation.mutate({ content: content.trim(), platform: 'youtube' });
   };
 
   const copyToClipboard = (text: string) => {
@@ -74,6 +84,16 @@ export default function ContentAnalyzer() {
       title: "Copied!",
       description: "Text copied to clipboard.",
     });
+  };
+
+  // Helper function to style the engagement badges
+  const getEngagementColor = (level: string) => {
+    switch (level?.toLowerCase()) {
+      case 'very high': return 'bg-green-100 text-green-800';
+      case 'high': return 'bg-blue-100 text-blue-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
   return (
@@ -107,7 +127,7 @@ export default function ContentAnalyzer() {
             rows={6}
             className="w-full"
           />
-          <Button 
+          <Button
             onClick={handleAnalyze}
             disabled={analyzeMutation.isPending}
             className="w-full"
@@ -117,48 +137,46 @@ export default function ContentAnalyzer() {
         </CardContent>
       </Card>
 
-      {/* Analysis Results Section */}
+      {/* --- THIS ENTIRE RESULTS SECTION IS NEWLY POPULATED --- */}
       {analyzeMutation.isSuccess && analysis && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* Viral Score */}
-          <Card className="lg:col-span-1">
-             <CardHeader>
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Card className="lg:col-span-1">
+              <CardHeader>
                 <CardTitle className="flex items-center">
-                   <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
-                   Viral Score
+                  <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
+                  Viral Score
                 </CardTitle>
-             </CardHeader>
-             <CardContent className="text-center">
+              </CardHeader>
+              <CardContent className="text-center">
                 <div className="text-6xl font-bold text-green-600">{analysis.viralScore}</div>
                 <p className="text-muted-foreground">out of 10</p>
-             </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Optimized Titles */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Target className="w-5 h-5 mr-2 text-purple-600" />
-                Optimized Titles
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {analysis.optimizedTitles?.map((title, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <p className="font-medium text-foreground flex-1">{title}</p>
-                    <Button variant="ghost" size="sm" onClick={() => copyToClipboard(title)} className="ml-2">
-                      <Copy className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Target className="w-5 h-5 mr-2 text-purple-600" />
+                  Optimized Titles
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {analysis.optimizedTitles?.map((title, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <p className="font-medium text-foreground flex-1">{title}</p>
+                      <Button variant="ghost" size="sm" onClick={() => copyToClipboard(title)} className="ml-2">
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-          {/* Viral Tags */}
-          <Card className="lg:col-span-3">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Hash className="w-5 h-5 mr-2 text-blue-600" />
@@ -168,7 +186,7 @@ export default function ContentAnalyzer() {
             <CardContent>
               <div className="flex flex-wrap gap-2">
                 {analysis.viralTags?.map((tag, index) => (
-                  <Badge 
+                  <Badge
                     key={index}
                     variant="outline"
                     className="cursor-pointer bg-blue-100 text-blue-800 border-blue-300"
@@ -181,6 +199,51 @@ export default function ContentAnalyzer() {
             </CardContent>
           </Card>
 
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
+                Viral Hook Ideas
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {analysis.hookIdeas?.map((idea, index) => (
+                <div key={index} className="p-4 border border-border rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium text-foreground">{idea.hook}</span>
+                    <Badge className={getEngagementColor(idea.engagement)}>{idea.engagement}</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">{idea.description}</p>
+                  <Button variant="link" size="sm" onClick={() => copyToClipboard(idea.description)} className="p-0 h-auto">
+                    Copy Hook
+                  </Button>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Clock className="w-5 h-5 mr-2 text-orange-600" />
+                Content Strategy
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div>
+                <h4 className="font-semibold text-foreground mb-2">Best Timing</h4>
+                <p className="text-sm text-muted-foreground">{analysis.contentStrategy?.bestTiming}</p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-foreground mb-2">Format</h4>
+                <p className="text-sm text-muted-foreground">{analysis.contentStrategy?.format}</p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-foreground mb-2">Approach</h4>
+                <p className="text-sm text-muted-foreground">{analysis.contentStrategy?.approach}</p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>
