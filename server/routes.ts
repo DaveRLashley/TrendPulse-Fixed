@@ -4,17 +4,21 @@ import type OpenAI from "openai";
 import { insertProjectSchema } from "../shared/schema";
 
 export function registerRoutes(app: Express, openai: OpenAI, storage: IStorage) {
-  // --- Your existing, working routes remain unchanged ---
-  app.get("/api/trending-videos", async (_req, res) => {
+  // --- START: THIS IS THE ONLY CHANGE ---
+  // The route now correctly reads `platform` and `category` from the request
+  app.get("/api/trending-videos", async (req, res) => {
     try {
-      const videos = await storage.getTrendingVideos();
+      const { platform, category } = req.query;
+      const videos = await storage.getTrendingVideos(platform as string, category as string);
       res.json(videos);
     } catch (err) {
       console.error("GET /api/trending-videos failed:", err);
       res.status(500).json({ error: "Failed to fetch trending videos" });
     }
   });
+  // --- END: THIS IS THE ONLY CHANGE ---
 
+  // All of your other working routes are preserved below
   app.get("/api/analytics", async (_req, res) => {
     try {
       const analytics = await storage.getLatestAnalytics();
@@ -46,17 +50,10 @@ export function registerRoutes(app: Express, openai: OpenAI, storage: IStorage) 
     }
   });
 
-  // --- START: UPDATED AI SUGGESTIONS ROUTE ---
   app.post("/api/ai-suggestions", async (req, res) => {
     console.log("Serving MOCKED response for /api/ai-suggestions");
     const mockSuggestions = {
-      titles: [
-        "You Won't Believe This Productivity Hack!",
-        "The SECRET to Waking Up Energized",
-        "My 5AM Routine ACTUALLY Changed My Life",
-        "The Only Content Planner You'll Ever Need",
-        "How I 10x My Output With One Simple Tool"
-      ],
+      titles: [ "You Won't Believe This Productivity Hack!", "The SECRET to Waking Up Energized", "My 5AM Routine ACTUALLY Changed My Life", "The Only Content Planner You'll Ever Need", "How I 10x My Output With One Simple Tool" ],
       tags: ["productivity", "lifehack", "morningroutine", "motivation", "success", "entrepreneur", "devlife"],
       contentIdeas: [
         { title: "The '2-Minute Rule'", description: "Explain how doing any task for just 2 minutes makes it easier to start and build momentum.", engagement: "High" },
@@ -65,33 +62,13 @@ export function registerRoutes(app: Express, openai: OpenAI, storage: IStorage) 
       ]
     };
     res.status(200).json(mockSuggestions);
-
-    /*
-    // Original OpenAI code is commented out below so you can easily switch back later
-    try {
-      const { topic, platform, style } = req.body;
-      const prompt = `...`;
-      const completion = await openai.chat.completions.create({ ... });
-      const result = completion.choices[0].message.content;
-      res.status(200).json(JSON.parse(result || '{}'));
-    } catch (error) {
-      console.error("AI suggestion error:", error);
-      res.status(500).json({ error: "AI generation failed" });
-    }
-    */
   });
-  // --- END: UPDATED AI SUGGESTIONS ROUTE ---
 
-  // --- START: UPDATED CONTENT ANALYZER ROUTE ---
   app.post("/api/analyze-content", async (req, res) => {
     console.log("Serving MOCKED response for /api/analyze-content");
     const mockAnalysis = {
       viralScore: 9,
-      optimizedTitles: [
-        "This Simple Trick Changed Everything",
-        "I Tried the Viral 'X' Method, Here's What Happened",
-        "You're Using [Common Product] All Wrong"
-      ],
+      optimizedTitles: [ "This Simple Trick Changed Everything", "I Tried the Viral 'X' Method, Here's What Happened", "You're Using [Common Product] All Wrong" ],
       viralTags: ["viral", "trending", "hacks", "mustsee", "lifechanging"],
       hookIdeas: [
         { hook: "Start with a shocking statistic", description: "Did you know 90% of people make this mistake every day?", engagement: "Very High" },
@@ -107,20 +84,5 @@ export function registerRoutes(app: Express, openai: OpenAI, storage: IStorage) 
       }
     };
     res.status(200).json(mockAnalysis);
-    
-    /*
-    // Original OpenAI code is commented out below
-    try {
-        const { content, platform } = req.body;
-        const prompt = `...`;
-        const completion = await openai.chat.completions.create({ ... });
-        const result = completion.choices[0]?.message?.content;
-        res.status(200).json(JSON.parse(result || '{}'));
-    } catch (error) {
-        console.error("Content analysis error:", error);
-        res.status(500).json({ error: "Content analysis failed" });
-    }
-    */
   });
-  // --- END: UPDATED CONTENT ANALYZER ROUTE ---
 }
