@@ -9,6 +9,16 @@
 ![TrendPulse App Demo](./assets/demo.gif)
 *Note: This demo GIF was recorded during development. The live version features the most up-to-date UI and data.*
 
+## ⚠️ Important Note on Load Time
+
+**⏳ First-time loading may take a few seconds.**
+
+TrendPulse's backend is currently hosted on Render's free tier, which may put the server to sleep after periods of inactivity. As a result, the first request (e.g., loading analytics or trending content) can take **5–10 seconds** while the server "wakes up." This is a known limitation of cold starts on free cloud services and **does not reflect the app’s actual performance under normal usage**.
+
+> Subsequent requests will load much faster once the server is active.
+
+We appreciate your patience and understanding while we continue building toward a fully optimized experience.
+
 ---
 
 ## 🔥 Features
