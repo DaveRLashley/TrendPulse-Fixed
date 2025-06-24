@@ -1,7 +1,6 @@
 import type { Express } from "express";
 import type { IStorage } from "./storage";
 import type OpenAI from "openai";
-import { insertProjectSchema } from "../shared/schema";
 
 export function registerRoutes(app: Express, openai: OpenAI, storage: IStorage) {
   // --- This route is now fixed to use the filters correctly ---
