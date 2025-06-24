@@ -20,16 +20,16 @@ interface AISuggestion {
 }
 
 const generateContentSuggestions = async (params: { topic: string, platform: string, style: string }): Promise<AISuggestion> => {
-  const response = await fetch(`${API_BASE_URL}/api/ai-suggestions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(params),
-  });
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || 'Failed to generate suggestions');
-  }
-  return response.json();
+    const response = await fetch(`${API_BASE_URL}/api/ai-suggestions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params),
+    });
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate suggestions');
+    }
+    return response.json();
 };
 
 export default function AISuggestions() {
@@ -55,11 +55,7 @@ export default function AISuggestions() {
   const styleOptions = ["educational", "entertaining", "inspiring", "funny", "trending"];
 
   const toggleStyle = (style: string) => {
-    setSelectedStyles(prev =>
-      prev.includes(style)
-        ? prev.filter(s => s !== style)
-        : [...prev, style]
-    );
+    setSelectedStyles(prev => prev.includes(style) ? prev.filter(s => s !== style) : [...prev, style]);
   };
 
   const copyToClipboard = (text: string) => {
@@ -78,168 +74,87 @@ export default function AISuggestions() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* --- START: Input Form --- */}
+      {/* Your complete input form UI */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Brain className="w-5 h-5 mr-2" />
-            Generate AI-Powered Content Ideas
-          </CardTitle>
+          <CardTitle className="flex items-center"><Brain className="w-5 h-5 mr-2" />Generate AI-Powered Content Ideas</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Content Topic
-              </label>
-              <Input
-                placeholder="e.g., productivity tips, cooking recipes"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">Content Topic</label>
+                    <Input placeholder="e.g., productivity tips" value={topic} onChange={(e) => setTopic(e.target.value)} />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">Target Platform</label>
+                    <Select value={platform} onValueChange={setPlatform}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="youtube">YouTube Shorts</SelectItem>
+                            <SelectItem value="tiktok">TikTok</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Target Platform
-              </label>
-              <Select value={platform} onValueChange={setPlatform}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="youtube">YouTube Shorts</SelectItem>
-                  <SelectItem value="tiktok">TikTok</SelectItem>
-                </SelectContent>
-              </Select>
+                <label className="block text-sm font-medium text-foreground mb-2">Content Style</label>
+                <div className="flex flex-wrap gap-2">
+                    {styleOptions.map((style) => (
+                        <Button key={style} variant={selectedStyles.includes(style) ? "default" : "outline"} size="sm" onClick={() => toggleStyle(style)}>
+                            {style.charAt(0).toUpperCase() + style.slice(1)}
+                        </Button>
+                    ))}
+                </div>
             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Content Style
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {styleOptions.map((style) => (
-                <Button
-                  key={style}
-                  variant={selectedStyles.includes(style) ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => toggleStyle(style)}
-                >
-                  {style.charAt(0).toUpperCase() + style.slice(1)}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          <Button
-            onClick={handleGenerate}
-            disabled={generateMutation.isPending}
-            className="w-full"
-          >
-            {generateMutation.isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <Brain className="w-4 h-4 mr-2" />
-                Generate AI Suggestions
-              </>
-            )}
-          </Button>
+            <Button onClick={handleGenerate} disabled={generateMutation.isPending} className="w-full">
+                {generateMutation.isPending ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Generating...</>) : (<>Generate AI Suggestions</>)}
+            </Button>
         </CardContent>
       </Card>
-      {/* --- END: Input Form --- */}
-
-      {/* --- START: Results --- */}
+      
+      {/* Your complete results display UI with added click-to-copy */}
       {generateMutation.isSuccess && suggestions && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Titles */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Hash className="w-5 h-5 mr-2 text-primary" />
-                Title Suggestions
-              </CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle>Title Suggestions</CardTitle></CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {suggestions.titles?.map((title, index) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <p className="font-medium text-foreground flex-1">{title}</p>
-                    <Button variant="link" size="sm" onClick={() => copyToClipboard(title)}>
-                      Use This
-                    </Button>
+                    <p className="font-medium flex-1">{title}</p>
+                    <Button variant="link" size="sm" onClick={() => copyToClipboard(title)}>Use This</Button>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
-
-          {/* Tags */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Hash className="w-5 h-5 mr-2 text-secondary" />
-                Trending Tags
-              </CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle>Trending Tags</CardTitle></CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-wrap gap-2">
                 {suggestions.tags?.map((tag, index) => (
-                  <Badge
-                    key={index}
-                    variant="outline"
-                    className="cursor-pointer bg-primary/10 text-primary border-primary"
-                    onClick={() => copyToClipboard(`#${tag}`)}
-                  >
-                    #{tag}
-                  </Badge>
+                  <Badge key={index} variant="outline" className="cursor-pointer" onClick={() => copyToClipboard(`#${tag}`)}>#{tag}</Badge>
                 ))}
-              </div>
-              <div className="p-3 bg-muted/50 rounded-lg text-sm text-muted-foreground">
-                💡 Click a tag to copy it to clipboard.
               </div>
             </CardContent>
           </Card>
-
-          {/* Content Ideas */}
           <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Lightbulb className="w-5 h-5 mr-2 text-warning" />
-                Content Ideas & Hooks
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {suggestions.contentIdeas?.map((idea, index) => (
-                  <div key={index} className="p-4 border border-border rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-foreground">{idea.title}</span>
-                      <Badge variant="outline" className="text-accent border-accent">
-                        {idea.engagement}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-2">{idea.description}</p>
-                    <Button
-                      variant="link"
-                      size="sm"
-                      className="p-0 h-auto"
-                      onClick={() => copyToClipboard(idea.description)}
-                    >
-                      Copy Idea
-                    </Button>
+            <CardHeader><CardTitle>Content Ideas & Hooks</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {suggestions.contentIdeas?.map((idea, index) => (
+                <div key={index} className="p-4 border rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium">{idea.title}</span>
+                    <Badge variant="secondary">{idea.engagement}</Badge>
                   </div>
-                ))}
-              </div>
+                  <p className="text-sm text-muted-foreground mb-2">{idea.description}</p>
+                  <Button variant="link" size="sm" className="p-0 h-auto" onClick={() => copyToClipboard(idea.description)}>Copy Idea</Button>
+                </div>
+              ))}
             </CardContent>
           </Card>
         </div>
       )}
-      {/* --- END: Results --- */}
     </div>
   );
 }
