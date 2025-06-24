@@ -5,7 +5,20 @@ import {
 } from "../shared/schema";
 
 export interface IStorage {
-  // ... all methods from the interface
+  getTrendingVideos(platform?: string, category?: string): Promise<TrendingVideo[]>;
+  getLatestAnalytics(): Promise<Analytics | undefined>;
+  getProjects(): Promise<Project[]>;
+  getProjectById(id: number): Promise<Project | null>;
+  createProject(project: InsertProject): Promise<Project>;
+  createUser(user: InsertUser): Promise<User>;
+  updateProject(id: number, updates: Partial<Project>): Promise<Project | undefined>;
+  createTrendingVideo(video: InsertTrendingVideo): Promise<TrendingVideo>;
+  getContentSuggestions(): Promise<ContentSuggestion[]>;
+  createContentSuggestion(suggestion: InsertContentSuggestion): Promise<ContentSuggestion>;
+  createAnalytics(analytics: InsertAnalytics): Promise<Analytics>;
+  updateAnalytics(id: number, updates: Partial<Analytics>): Promise<Analytics | undefined>;
+  getUser(id: number): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -25,13 +38,14 @@ export class MemStorage implements IStorage {
   }
 
   private initializeData(): void {
-    // UPDATED: Removed Instagram video, now 5 total
     const sampleVideos: Omit<TrendingVideo, 'id' | 'createdAt'>[] = [
       { title: "My Perfect Morning Routine", platform: "youtube", views: 2100000, viralScore: 9.2, creator: "@productivityguru", category: "Lifestyle", thumbnailUrl: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136" },
-      { title: "Top Netflix Shows ✨", platform: "tiktok", views: 890000, viralScore: 8.7, creator: "@watchhacks101", category: "Beauty", thumbnailUrl: "https://images.unsplash.com/photo-1611162617474-5b21e879e113" },
-      { title: "How I Landed My Dream Job", platform: "youtube", views: 1500000, viralScore: 9.5, creator: "@growthhacker", category: "Marketing", thumbnailUrl: "https://images.unsplash.com/photo-1586281380349-632531db7ed4" },
-      { title: "Day in My Life as a Dev", platform: "youtube", views: 450000, viralScore: 7.9, creator: "@codedaily", category: "Lifestyle", thumbnailUrl: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c" },
-      { title: "Amazing Abs in 30 Days", platform: "tiktok", views: 1340000, viralScore: 8.8, creator: "@trendspotter", category: "Entertainment", thumbnailUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b" },
+      { title: "Top Netflix Shows ✨", platform: "tiktok", views: 890000, viralScore: 8.7, creator: "@watchhacks101", category: "Entertainment", thumbnailUrl: "https://images.unsplash.com/photo-1611162617474-5b21e879e113" },
+      { title: "How I Landed My Dream Job", platform: "youtube", views: 1500000, viralScore: 9.5, creator: "@growthhacker", category: "Education", thumbnailUrl: "https://images.unsplash.com/photo-1586281380349-632531db7ed4" },
+      { title: "Day in My Life as a Dev", platform: "youtube", views: 450000, viralScore: 7.9, creator: "@codedaily", category: "Technology", thumbnailUrl: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c" },
+      { title: "Amazing Abs in 30 Days", platform: "tiktok", views: 1340000, viralScore: 8.8, creator: "@trendspotter", category: "Fitness", thumbnailUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b" },
+      { title: "5 Minute Makeup Tutorial", platform: "tiktok", views: 950000, viralScore: 8.9, creator: "@beautypro", category: "Beauty", thumbnailUrl: "https://images.unsplash.com/photo-1596704017254-9b121068fb31?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=225" },
+      { title: "My Perfect Morning Routine (Breakfast Ideas)", platform: "youtube", views: 1900000, viralScore: 9.1, creator: "@productivityguru", category: "Food", thumbnailUrl: "https://images.unsplash.com/photo-1525351484163-7529414344d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=225" },
     ];
     sampleVideos.forEach(video => this.createTrendingVideo(video));
 
@@ -44,7 +58,6 @@ export class MemStorage implements IStorage {
 
     const sampleAnalytics: Omit<Analytics, "id" | "createdAt"> = {
       totalViews: 2400000, viralScore: 8.7, engagementRate: 15.2, growthRate: 24, videosPublished: 42, newFollowers: 156000,
-      // UPDATED: Removed Instagram and adjusted values
       platformDistribution: { youtube: 65, tiktok: 35 },
       performanceData: {
         daily: [12000, 19000, 15000, 25000, 22000, 30000, 28000],
@@ -54,7 +67,7 @@ export class MemStorage implements IStorage {
     this.createAnalytics(sampleAnalytics);
   }
 
-  // --- All 13 storage methods are fully implemented below ---
+  // --- All 13 storage methods implemented below ---
   async getUser(id: number): Promise<User | undefined> { return this.users.get(id); }
   async getUserByUsername(username: string): Promise<User | undefined> { return Array.from(this.users.values()).find(user => user.username === username); }
   async createUser(insertUser: InsertUser): Promise<User> {
